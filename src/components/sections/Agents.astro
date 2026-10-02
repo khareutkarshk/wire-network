@@ -2,16 +2,46 @@
 import { Icon } from 'astro-icon/components';
 import Section from '../ui/Section.astro';
 import Eyebrow from '../ui/Eyebrow.astro';
+import ChainLogo from '../ui/ChainLogo.astro';
 
-const requirements = [
-	{ icon: 'ph:check-square-offset', label: 'Deterministic transaction state' },
-	{ icon: 'ph:brackets-curly', label: 'Machine-readable outcomes' },
-	{ icon: 'ph:magnifying-glass', label: 'Queryable execution lifecycle' },
-	{ icon: 'ph:sliders-horizontal', label: 'Policy-driven workflows' },
-	{ icon: 'ph:lightning', label: 'High-frequency transactions' },
-	{ icon: 'ph:arrows-split', label: 'Multi-chain execution' },
-	{ icon: 'ph:clipboard-text', label: 'Auditable financial state' },
+// The 7 agent requirements from data.md, each lit by the trace step that satisfies it
+const trace = [
+	{
+		verb: 'Policy',
+		icon: 'ph:sliders-horizontal',
+		detail: 'Rebalance the treasury when an inbound transfer settles',
+		code: false,
+		tags: ['Policy-driven workflows'],
+	},
+	{
+		verb: 'Query',
+		icon: 'ph:magnifying-glass',
+		detail: 'state("0x7a3f…c91e") → "settled"',
+		code: true,
+		tags: ['Queryable lifecycle', 'Machine-readable outcomes'],
+	},
+	{
+		verb: 'Verify',
+		icon: 'ph:seal-check',
+		detail: 'One deterministic answer with an auditable record. No confirmation guesswork.',
+		code: false,
+		tags: ['Deterministic state', 'Auditable state'],
+	},
+	{
+		verb: 'Act',
+		icon: 'ph:lightning',
+		detail: 'Dispatch transfers to Solana, Cardano and BNB Chain',
+		code: false,
+		tags: ['Multi-chain execution', 'High-frequency transactions'],
+		chains: [
+			{ icon: 'cryptocurrency:sol', name: 'Solana' },
+			{ icon: 'cryptocurrency:ada', name: 'Cardano' },
+			{ icon: 'cryptocurrency:bnb', name: 'BNB Chain' },
+		],
+	},
 ];
+const total = trace.reduce((n, t) => n + t.tags.length, 0);
+
 const questions = [
 	'Which chain holds the asset?',
 	'Is the token wrapped?',
@@ -22,126 +52,284 @@ const questions = [
 ---
 
 <Section id="agents" labelledby="agents-title" tone="raised">
-	<div class="max-w-[46rem]">
-		<Eyebrow>The autonomous AI economy</Eyebrow>
-		<h2 id="agents-title" class="mt-5 text-h2 font-medium text-fg-1" data-split>Software is starting to move money. It needs certainty.</h2>
+	<div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+		<div class="max-w-[46rem]">
+			<Eyebrow>The autonomous AI economy</Eyebrow>
+			<h2 id="agents-title" class="mt-5 text-h2 font-medium text-fg-1" data-split>Software is starting to move money. It needs certainty.</h2>
+		</div>
+		<div role="tablist" aria-label="Who Wire is built for" class="tabs inline-flex shrink-0 self-start rounded-control border border-line-strong bg-ink-950 p-1 lg:self-end">
+			<button role="tab" id="tab-agents" aria-controls="panel-agents" aria-selected="true" class="tab">
+				<Icon name="ph:robot" class="size-4" aria-hidden="true" />For agents
+			</button>
+			<button role="tab" id="tab-people" aria-controls="panel-people" aria-selected="false" tabindex="-1" class="tab">
+				<Icon name="ph:user" class="size-4" aria-hidden="true" />For people
+			</button>
+		</div>
 	</div>
 
 	<div class="mt-12" data-tabs>
-		<div role="tablist" aria-label="Who Wire is built for" class="inline-flex rounded-control border border-line-strong bg-ink-950 p-1">
-			<button role="tab" id="tab-agents" aria-controls="panel-agents" aria-selected="true" class="tab">For agents</button>
-			<button role="tab" id="tab-people" aria-controls="panel-people" aria-selected="false" tabindex="-1" class="tab">For people</button>
-		</div>
-
-		<!-- Agents -->
-		<div role="tabpanel" id="panel-agents" aria-labelledby="tab-agents" class="mt-10 grid gap-12 lg:grid-cols-12">
-			<blockquote class="lg:col-span-5">
-				<p class="text-[clamp(1.5rem,1.1rem+1.4vw,2.25rem)] leading-[1.2] tracking-[-0.025em] text-fg-1">
+		<!-- Agents: a live decision trace -->
+		<div role="tabpanel" id="panel-agents" aria-labelledby="tab-agents" class="grid gap-10 lg:grid-cols-12 lg:gap-12">
+			<div class="flex flex-col lg:col-span-5">
+				<p class="text-[1.625rem] leading-tight tracking-[-0.02em] text-fg-1">
 					Agents should act on confirmed financial state, not probabilistic outcomes.
 				</p>
-				<p class="mt-5 max-w-[42ch] text-fg-2">
-					Autonomous agents need machine-readable state, predictable execution and clearly defined outcomes. Wire is built around those requirements.
+				<p class="mt-5 max-w-[44ch] text-fg-2">
+					An autonomous agent can't eyeball a block explorer. It needs a state it can query, trust and act on, every time.
 				</p>
-			</blockquote>
-			<ul class="grid gap-px overflow-hidden rounded-panel border border-line bg-line sm:grid-cols-2 lg:col-span-7">
-				{requirements.map((r, i) => (
-					<li class:list={['flex items-center gap-4 bg-ink-900 p-5', i === requirements.length - 1 && 'sm:col-span-2']}>
-						<Icon name={r.icon} class="size-5 shrink-0 text-accent-soft" aria-hidden="true" />
-						<span class="text-fg-1">{r.label}</span>
-					</li>
-				))}
-			</ul>
+
+				<!-- The whole argument in two lines -->
+				<dl class="mt-10 overflow-hidden rounded-panel border border-line lg:mt-auto">
+					<div class="flex items-center justify-between gap-4 border-b border-line px-5 py-4">
+						<dt class="text-sm text-fg-3">Bridge-style answer</dt>
+						<dd class="font-mono text-mono-s text-fg-3"><span class="line-through decoration-fg-3/60">"probably_final"</span></dd>
+					</div>
+					<div class="flex items-center justify-between gap-4 bg-state-settled/5 px-5 py-4">
+						<dt class="text-sm text-fg-1">Wire answer</dt>
+						<dd class="font-mono text-mono-s text-state-settled">"settled"</dd>
+					</div>
+				</dl>
+			</div>
+
+			<div class="trace panel-edge overflow-hidden rounded-panel border border-line bg-ink-950 lg:col-span-7" data-trace>
+				<div class="flex items-center justify-between border-b border-line px-5 py-3.5">
+					<span class="flex items-center gap-2.5 font-mono text-mono-s text-fg-1">
+						<span class="flex size-6 items-center justify-center rounded-[5px] bg-accent/15 text-accent-soft"><Icon name="ph:robot" class="size-3.5" aria-hidden="true" /></span>
+						treasury-agent
+					</span>
+					<span class="flex items-center gap-3">
+						<span class="hidden font-mono text-mono-xs text-fg-3 sm:inline">Illustrative run</span>
+						<button type="button" class="replay inline-flex size-8 items-center justify-center rounded-control border border-line-strong text-fg-2" data-trace-replay>
+							<Icon name="ph:arrow-counter-clockwise" class="size-3.5" aria-hidden="true" />
+							<span class="sr-only">Replay agent run</span>
+						</button>
+					</span>
+				</div>
+
+				<ol class="flex flex-col p-3" aria-label="Agent decision steps">
+					{
+						trace.map((t, i) => (
+							<li class="t-step grid grid-cols-[2rem_1fr] gap-x-3 rounded-control px-3 py-3.5 md:grid-cols-[2rem_1fr_auto]" data-t-step={i} data-status="done">
+								<span class="t-marker mt-0.5 flex size-8 items-center justify-center rounded-control border" aria-hidden="true">
+									<Icon name={t.icon} class="size-4" />
+								</span>
+								<div class="min-w-0">
+									<p class="t-verb text-[0.9375rem] font-medium">{t.verb}</p>
+									<p class:list={['t-detail mt-1', t.code ? 'font-mono text-mono-s' : 'text-sm']}>{t.detail}</p>
+									{t.chains && (
+										<div class="mt-2.5 flex gap-1.5" aria-hidden="true">
+											{t.chains.map((c) => (
+												<span class="flex size-6 items-center justify-center rounded-[5px] border border-line-strong bg-ink-800 text-fg-1">
+													<ChainLogo icon={c.icon} name={c.name} class="size-3.5" />
+												</span>
+											))}
+										</div>
+									)}
+								</div>
+								<ul class="col-start-2 mt-3 flex flex-wrap gap-1.5 md:col-start-3 md:mt-0 md:max-w-52 md:justify-end md:self-start">
+									{t.tags.map((tag) => <li class="t-tag">{tag}</li>)}
+								</ul>
+							</li>
+						))
+					}
+				</ol>
+
+				<div class="flex items-center gap-4 border-t border-line px-5 py-4">
+					<div class="flex flex-1 gap-1" aria-hidden="true">
+						{Array.from({ length: total }, () => <span class="t-seg h-1 flex-1 rounded-[1px]" />)}
+					</div>
+					<p class="shrink-0 font-mono text-mono-s text-fg-2" aria-live="polite">
+						<span class="text-fg-1" data-trace-count>{total}</span> of {total} agent requirements met
+					</p>
+				</div>
+			</div>
 		</div>
 
-		<!-- People -->
-		<div role="tabpanel" id="panel-people" aria-labelledby="tab-people" class="mt-10 grid gap-12 lg:grid-cols-12" hidden>
+		<!-- People: the questions disappear into one sentence -->
+		<div role="tabpanel" id="panel-people" aria-labelledby="tab-people" class="grid gap-10 lg:grid-cols-12 lg:gap-12" hidden>
 			<div class="lg:col-span-5">
-				<p class="text-[clamp(1.5rem,1.1rem+1.4vw,2.25rem)] leading-[1.2] tracking-[-0.025em] text-fg-1">Multi-chain, without the chain anxiety.</p>
-				<p class="mt-5 max-w-[42ch] text-fg-2">
+				<p class="text-[1.625rem] leading-tight tracking-[-0.02em] text-fg-1">Multi-chain, without the chain anxiety.</p>
+				<p class="mt-5 max-w-[44ch] text-fg-2">
 					People shouldn't need to understand every chain behind a transaction. Wire makes many ecosystems behave like one financial environment.
 				</p>
 			</div>
-			<ul class="flex flex-col lg:col-span-7" data-questions>
-				{questions.map((q) => (
-					<li class="flex items-center justify-between gap-6 border-b border-line py-4 last:border-b-0">
-						<span class="question text-lg text-fg-1">{q}</span>
-						<span class="shrink-0 font-mono text-mono-xs uppercase tracking-widest text-fg-3">Handled</span>
-					</li>
-				))}
-			</ul>
+			<div class="panel-edge overflow-hidden rounded-panel border border-line bg-ink-950 lg:col-span-7" data-questions>
+				<p class="border-b border-line px-5 py-3.5 text-sm text-fg-3">What you'd normally have to work out</p>
+				<ul class="px-5 py-2">
+					{questions.map((q) => (
+						<li class="flex items-center justify-between gap-6 border-b border-line py-3.5 last:border-b-0">
+							<span class="question text-fg-1">{q}</span>
+							<span class="handled shrink-0 font-mono text-mono-xs uppercase tracking-widest text-fg-3">Handled</span>
+						</li>
+					))}
+				</ul>
+				<div class="answer flex items-center gap-4 border-t border-line bg-state-settled/5 px-5 py-5">
+					<span class="flex size-9 shrink-0 items-center justify-center rounded-control bg-state-settled/15 text-state-settled">
+						<Icon name="ph:check-bold" class="size-4" aria-hidden="true" />
+					</span>
+					<div>
+						<p class="text-xs text-fg-3">What you see on Wire</p>
+						<p class="mt-0.5 text-fg-1">Sent 1,250 USDC to Solana. <span class="text-state-settled">Settled.</span></p>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </Section>
 
 <style>
 	.tab {
-		height: 2.25rem;
-		padding: 0 1rem;
+		display: inline-flex;
+		height: 2.5rem;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0 1.125rem;
 		border-radius: 4px;
 		font-size: 0.875rem;
 		font-weight: 500;
 		color: var(--color-fg-2);
 		transition: background-color var(--duration-ui), color var(--duration-ui);
 	}
-	.tab:hover {
-		color: var(--color-fg-1);
+	.tab:hover { color: var(--color-fg-1); }
+	.tab[aria-selected='true'] { background: var(--color-fg-1); color: var(--color-ink-950); }
+
+	/* Trace steps: idle -> active -> done */
+	.t-step { transition: background-color var(--duration-reveal) var(--ease-out-expo); }
+	.t-step[data-status='active'] { background: rgb(47 107 255 / 0.07); }
+	.t-marker {
+		border-color: var(--color-line-strong);
+		background: var(--color-ink-900);
+		color: var(--color-fg-3);
+		transition: all var(--duration-ui);
 	}
-	.tab[aria-selected='true'] {
-		background: var(--color-fg-1);
-		color: var(--color-ink-950);
+	.t-step[data-status='active'] .t-marker { border-color: var(--color-accent); color: var(--color-accent-soft); box-shadow: 0 0 0 4px rgb(47 107 255 / 0.15); }
+	.t-step[data-status='done'] .t-marker { border-color: rgb(126 165 255 / 0.4); background: rgb(47 107 255 / 0.12); color: var(--color-accent-soft); }
+	.t-verb, .t-detail { transition: color var(--duration-ui); }
+	.t-verb { color: var(--color-fg-3); }
+	.t-detail { color: var(--color-fg-3); }
+	.t-step:not([data-status='idle']) .t-verb { color: var(--color-fg-1); }
+	.t-step:not([data-status='idle']) .t-detail { color: var(--color-fg-2); }
+
+	.t-tag {
+		border-radius: 4px;
+		border: 1px solid var(--color-line-strong);
+		padding: 0.1875rem 0.5rem;
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		line-height: 1.3;
+		color: var(--color-fg-3);
+		white-space: nowrap;
+		transition: color var(--duration-reveal), border-color var(--duration-reveal), background-color var(--duration-reveal);
 	}
-	/* The question gets answered: a line strikes through it */
+	.t-step[data-status='done'] .t-tag {
+		color: var(--color-accent-soft);
+		border-color: rgb(126 165 255 / 0.35);
+		background: rgb(47 107 255 / 0.08);
+	}
+
+	.t-seg { background: var(--color-line-strong); transition: background-color var(--duration-reveal); }
+	.t-seg.is-on { background: var(--color-accent); }
+	.t-seg.is-on:last-child { background: var(--color-state-settled); }
+	.replay { transition: color var(--duration-ui), border-color var(--duration-ui); }
+	.replay:hover { color: var(--color-fg-1); border-color: var(--color-fg-3); }
+	.replay[disabled] { opacity: 0.4; pointer-events: none; }
+
+	/* People: questions get struck, then the one answer lands */
 	.question {
 		background: linear-gradient(var(--color-fg-3), var(--color-fg-3)) 0 55% / var(--strike, 0%) 1px no-repeat;
 		transition: color var(--duration-reveal) var(--ease-out-expo);
 	}
-	[data-questions].is-struck .question {
-		--strike: 100%;
-		color: var(--color-fg-3);
-	}
+	[data-questions].is-struck .question { --strike: 100%; color: var(--color-fg-3); }
+	[data-questions].is-struck .handled { color: var(--color-accent-soft); }
 </style>
 
 <script>
 	import { gsap, prefersReducedMotion } from '../../lib/motion';
 
-	document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
-		const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-		const reduce = prefersReducedMotion();
+	const reduce = prefersReducedMotion();
 
-		const strike = (panel: HTMLElement) => {
-			const list = panel.querySelector<HTMLElement>('[data-questions]');
-			if (!list) return;
-			list.classList.remove('is-struck');
-			const qs = list.querySelectorAll<HTMLElement>('.question');
+	// Agent trace: steps run in sequence, each lighting the requirements it satisfies
+	const trace = document.querySelector<HTMLElement>('[data-trace]');
+	if (trace) {
+		const steps = [...trace.querySelectorAll<HTMLElement>('[data-t-step]')];
+		const segs = [...trace.querySelectorAll<HTMLElement>('.t-seg')];
+		const count = trace.querySelector<HTMLElement>('[data-trace-count]')!;
+		const replay = trace.querySelector<HTMLButtonElement>('[data-trace-replay]')!;
+		const tagsUpTo = (i: number) => steps.slice(0, i + 1).reduce((n, s) => n + s.querySelectorAll('.t-tag').length, 0);
+		let timers: number[] = [];
+
+		const paint = (active: number, doneCount: number) => {
+			steps.forEach((s, i) => (s.dataset.status = i < active ? 'done' : i === active ? 'active' : 'idle'));
+			segs.forEach((seg, i) => seg.classList.toggle('is-on', i < doneCount));
+			count.textContent = String(doneCount);
+		};
+
+		const run = () => {
+			timers.forEach(clearTimeout);
+			timers = [];
 			if (reduce) {
-				list.classList.add('is-struck');
+				paint(steps.length, segs.length);
 				return;
 			}
-			gsap.fromTo(qs, { '--strike': '0%' }, { '--strike': '100%', duration: 0.5, stagger: 0.12, ease: 'expo.out', delay: 0.35, onComplete: () => list.classList.add('is-struck') });
+			replay.disabled = true;
+			paint(0, 0);
+			steps.forEach((_, i) => {
+				// step i completes: its tags light, the next step becomes active
+				timers.push(window.setTimeout(() => paint(i + 1, tagsUpTo(i)), 900 * (i + 1)));
+			});
+			timers.push(window.setTimeout(() => (replay.disabled = false), 900 * steps.length + 100));
 		};
 
-		const select = (tab: HTMLButtonElement) => {
-			tabs.forEach((t) => {
-				const on = t === tab;
-				t.setAttribute('aria-selected', String(on));
-				t.tabIndex = on ? 0 : -1;
-				const panel = document.getElementById(t.getAttribute('aria-controls')!)!;
-				panel.hidden = !on;
-				if (on) {
-					if (!reduce) gsap.fromTo(panel, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.45, ease: 'expo.out' });
-					strike(panel);
-				}
-			});
-		};
+		replay.addEventListener('click', run);
+		segs.forEach((s) => s.classList.add('is-on'));
+		new IntersectionObserver(([e], obs) => {
+			if (!e.isIntersecting) return;
+			run();
+			obs.disconnect();
+		}, { threshold: 0.4 }).observe(trace);
+	}
 
-		tabs.forEach((t, i) => {
-			t.addEventListener('click', () => select(t));
-			t.addEventListener('keydown', (e) => {
-				if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-				const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
-				next.focus();
-				select(next);
-			});
+	// Tabs (ARIA tablist with arrow keys)
+	const tabs = [...document.querySelectorAll<HTMLButtonElement>('#agents [role="tab"]')];
+	const strike = (panel: HTMLElement) => {
+		const box = panel.querySelector<HTMLElement>('[data-questions]');
+		if (!box) return;
+		box.classList.remove('is-struck');
+		if (reduce) return void box.classList.add('is-struck');
+		const answer = box.querySelector('.answer');
+		gsap.set(answer, { opacity: 0, y: 8 });
+		gsap.fromTo(box.querySelectorAll('.question'), { '--strike': '0%' }, {
+			'--strike': '100%',
+			duration: 0.45,
+			stagger: 0.12,
+			ease: 'expo.out',
+			delay: 0.3,
+			onComplete: () => {
+				box.classList.add('is-struck');
+				gsap.to(answer, { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out' });
+			},
+		});
+	};
+	const select = (tab: HTMLButtonElement) => {
+		tabs.forEach((t) => {
+			const on = t === tab;
+			t.setAttribute('aria-selected', String(on));
+			t.tabIndex = on ? 0 : -1;
+			const panel = document.getElementById(t.getAttribute('aria-controls')!)!;
+			panel.hidden = !on;
+			if (on) {
+				if (!reduce) gsap.fromTo(panel, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.45, ease: 'expo.out' });
+				strike(panel);
+			}
+		});
+	};
+	tabs.forEach((t, i) => {
+		t.addEventListener('click', () => select(t));
+		t.addEventListener('keydown', (e) => {
+			if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+			const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+			next.focus();
+			select(next);
 		});
 	});
 </script>

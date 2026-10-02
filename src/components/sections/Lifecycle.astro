@@ -2,22 +2,15 @@
 import { Icon } from 'astro-icon/components';
 import Section from '../ui/Section.astro';
 import Heading from '../ui/Heading.astro';
-import Panel from '../ui/Panel.astro';
 import LifecycleDemo from '../ui/LifecycleDemo.astro';
 
-const today = [
-	'Assets move between chains',
-	'Bridges add their own custody assumptions',
-	'Every app builds its own recovery system',
-	'Failed transactions are hard to reconcile',
-	'Liquidity fragments across ecosystems',
-];
-const wire = [
-	'Assets remain native to their home chains',
-	'Ownership rights are coordinated through Wire',
-	'Transactions follow a defined lifecycle',
-	'Outcomes are explicit and queryable',
-	'Recovery is part of the execution model',
+// Each row pairs a bridge-model problem with the Wire answer to it (data.md: How it works)
+const pairs = [
+	{ bridge: 'Assets move between chains', wire: 'Assets stay native to their home chains' },
+	{ bridge: 'Bridges add their own custody assumptions', wire: 'Ownership rights are coordinated through Wire' },
+	{ bridge: 'Every app builds its own recovery system', wire: 'Recovery is part of the execution model' },
+	{ bridge: 'Failed transactions are hard to reconcile', wire: 'Outcomes are explicit and queryable' },
+	{ bridge: 'Liquidity fragments across ecosystems', wire: 'One shared financial state across ecosystems' },
 ];
 ---
 
@@ -29,32 +22,70 @@ const wire = [
 		</p>
 	</div>
 
-	<div class="mt-14 grid gap-4 md:grid-cols-12">
-		<div class="rounded-panel border border-line p-6 md:col-span-5 md:p-8" data-reveal>
-			<p class="text-sm font-medium text-fg-3">Bridge model</p>
-			<ul class="mt-6 flex flex-col gap-4">
-				{today.map((t) => (
-					<li class="flex gap-3 text-fg-3">
-						<Icon name="ph:x" class="mt-1 size-4 shrink-0" aria-hidden="true" />
-						<span>{t}</span>
-					</li>
-				))}
-			</ul>
+	<!-- Paired comparison: read across each row, problem to answer -->
+	<div class="compare mt-14 overflow-hidden rounded-panel border border-line" role="table" aria-label="Bridge model compared with the Wire model" data-reveal>
+		<div role="row" class="grid grid-cols-1 border-b border-line md:grid-cols-[1fr_3.5rem_1fr]">
+			<div role="columnheader" class="hidden px-6 py-4 text-sm text-fg-3 md:block">Bridge model</div>
+			<div class="hidden md:block" aria-hidden="true"></div>
+			<div role="columnheader" class="wire-col flex items-center gap-2.5 px-6 py-4 text-sm font-medium text-fg-1">
+				<Icon name="wire" class="h-2.5 w-auto text-accent-soft" aria-hidden="true" />
+				Wire model
+			</div>
 		</div>
-		<Panel surface="tint" class="p-6 md:col-span-7 md:p-8" data-reveal data-reveal-delay="0.08">
-			<p class="text-sm font-medium text-fg-1">Wire model</p>
-			<ul class="mt-6 grid gap-4 sm:grid-cols-2">
-				{wire.map((t) => (
-					<li class="flex gap-3 text-fg-1">
-						<Icon name="ph:check" class="mt-1 size-4 shrink-0 text-accent-soft" aria-hidden="true" />
-						<span>{t}</span>
-					</li>
-				))}
-			</ul>
-		</Panel>
+		{
+			pairs.map((p, i) => (
+				<div role="row" class:list={['pair group grid grid-cols-1 md:grid-cols-[1fr_3.5rem_1fr]', i < pairs.length - 1 && 'border-b border-line']}>
+					<div role="cell" class="flex items-center gap-3 px-6 pt-5 pb-2 text-fg-3 md:py-5">
+						<Icon name="ph:x" class="size-4 shrink-0 opacity-70" aria-hidden="true" />
+						<span class="bridge-text">{p.bridge}</span>
+					</div>
+					<div class="hidden items-center justify-center md:flex" aria-hidden="true">
+						<Icon name="ph:arrow-right" class="pair-arrow size-4 text-fg-3" />
+					</div>
+					<div role="cell" class="wire-col flex items-center gap-3 px-6 pt-2 pb-5 text-fg-1 md:py-5">
+						<Icon name="ph:check" class="size-4 shrink-0 text-accent-soft" aria-hidden="true" />
+						<span>{p.wire}</span>
+					</div>
+				</div>
+			))
+		}
 	</div>
 
-	<div class="mt-4" data-reveal>
+	<div class="mt-20" data-reveal>
+		<h3 class="text-h3 font-medium text-fg-1">Run one yourself</h3>
+		<p class="mt-2 max-w-[52ch] text-fg-2">Pick an outcome. Either way the receipt ends in a defined state an app or agent can read.</p>
+	</div>
+	<div class="mt-6" data-reveal data-reveal-delay="0.06">
 		<LifecycleDemo />
 	</div>
 </Section>
+
+<style>
+	.compare {
+		background: var(--color-ink-950);
+	}
+	/* The Wire column is the answer: give it the tint */
+	.wire-col {
+		background: linear-gradient(90deg, rgb(47 107 255 / 0.07), rgb(47 107 255 / 0.03));
+	}
+	.pair {
+		transition: background-color var(--duration-ui);
+	}
+	.pair:hover {
+		background: var(--color-ink-900);
+	}
+	.pair-arrow {
+		transition: color var(--duration-ui), transform var(--duration-reveal) var(--ease-out-expo);
+	}
+	.pair:hover .pair-arrow {
+		color: var(--color-accent-soft);
+		transform: translateX(3px);
+	}
+	.bridge-text {
+		background: linear-gradient(currentColor, currentColor) 0 55% / 0% 1px no-repeat;
+		transition: background-size var(--duration-reveal) var(--ease-out-expo);
+	}
+	.pair:hover .bridge-text {
+		background-size: 100% 1px;
+	}
+</style>

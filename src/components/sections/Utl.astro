@@ -7,9 +7,9 @@ import { CHAINS } from '../../lib/site';
 const apps = ['DEXs', 'Wallets', 'DeFi protocols', 'AI agents', 'Financial apps'];
 const functions = ['Routing', 'Validation', 'Settlement', 'Risk control'];
 const steps = [
-	{ title: 'Applications', body: 'DEXs, wallets, DeFi protocols, trading systems and autonomous agents connect once.' },
-	{ title: 'Wire UTL', body: 'Routes, validates and settles each transaction, with risk control on every path.' },
-	{ title: 'Blockchains', body: 'Ethereum, Solana, Cardano and 300+ more. Assets never leave their native chain.' },
+	{ title: 'Applications connect once', body: 'DEXs, wallets, protocols and agents.' },
+	{ title: 'Wire coordinates', body: 'Routing, validation, settlement, risk control.' },
+	{ title: 'Chains stay sovereign', body: '300+ networks. Assets never leave home.' },
 ];
 
 // Connector geometry (viewBox 1000 x 100): fan in from 5 apps, fan out to 8 chain slots.
@@ -32,12 +32,12 @@ const fanOut = Array.from({ length: 8 }, (_, i) => {
 				<div class="lg:col-span-4 lg:self-center">
 					<Eyebrow>Universal Transaction Layer</Eyebrow>
 					<h2 id="utl-title" class="mt-5 text-h2 font-medium text-fg-1">One layer between applications and chains</h2>
-					<ol class="mt-10 flex flex-col gap-6">
+					<ol class="utl-steps mt-12 flex flex-col" data-steps>
 						{
 							steps.map((s, i) => (
-								<li class="utl-step border-l border-line-strong pl-5" data-step={i}>
-									<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-accent-soft">{s.title}</p>
-									<p class="mt-2 max-w-[36ch] text-fg-2">{s.body}</p>
+								<li class="utl-step relative py-3.5 pl-6" data-step={i} data-active="true">
+									<p class="step-title text-[1.0625rem] font-medium">{s.title}</p>
+									<p class="step-body mt-1 text-[0.9375rem]">{s.body}</p>
 								</li>
 							))
 						}
@@ -95,6 +95,24 @@ const fanOut = Array.from({ length: 8 }, (_, i) => {
 </section>
 
 <style>
+	/* Story rail: one continuous line, the active step's segment lights up */
+	.utl-step::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		width: 2px;
+		background: var(--color-line-strong);
+		transition: background-color var(--duration-reveal) var(--ease-out-expo);
+	}
+	.step-title { color: var(--color-fg-1); transition: color var(--duration-reveal) var(--ease-out-expo); }
+	.step-body { color: var(--color-fg-2); transition: color var(--duration-reveal) var(--ease-out-expo); }
+	.utl-step[data-active='true']::before { background: var(--color-accent); }
+	.utl-step[data-active='false'] .step-title { color: var(--color-fg-3); }
+	.utl-step[data-active='false'] .step-body { color: var(--color-fg-3); }
+	.utl-step[data-active='false']::before { background: var(--color-line-strong); }
+
 	.utl-core {
 		background:
 			radial-gradient(80% 140% at 50% 0%, rgb(47 107 255 / 0.18), transparent 70%),
@@ -128,25 +146,32 @@ const fanOut = Array.from({ length: 8 }, (_, i) => {
 		mm.add('(min-width: 1024px)', () => {
 			const q = gsap.utils.selector(root);
 			const steps = q('[data-step]');
+			const setActive = (n: number) => steps.forEach((el, i) => ((el as HTMLElement).dataset.active = String(i === n)));
+			setActive(0);
 			const tl = gsap.timeline({
 				defaults: { ease: 'none' },
-				scrollTrigger: { trigger: root, start: 'top top', end: '+=180%', pin: '.utl-pin', scrub: 0.6 },
+				scrollTrigger: {
+					trigger: root,
+					start: 'top top',
+					end: '+=180%',
+					pin: '.utl-pin',
+					scrub: 0.6,
+					// Story follows the diagram: apps, then the UTL, then chains
+					onUpdate: (self) => setActive(self.progress < 0.34 ? 0 : self.progress < 0.66 ? 1 : 2),
+				},
 			});
-			gsap.set(steps, { opacity: 0.3 });
 			gsap.set(q('[data-line]'), { strokeDashoffset: 1 });
 
-			tl.set(steps[0], { opacity: 1 })
-				.from(q('[data-layer="apps"] li'), { opacity: 0.15, y: -10, stagger: 0.05, duration: 0.4 })
+			tl.from(q('[data-layer="apps"] li'), { opacity: 0.15, y: -10, stagger: 0.05, duration: 0.4 })
 				.to(q('[data-line="in"]'), { strokeDashoffset: 0, stagger: 0.04, duration: 0.5 })
-				.to(steps[0], { opacity: 0.3, duration: 0.1 }, '<0.3')
-				.to(steps[1], { opacity: 1, duration: 0.1 }, '<')
-				.from(q('[data-layer="core"]'), { opacity: 0.2, scale: 0.97, duration: 0.4 }, '<')
+				.from(q('[data-layer="core"]'), { opacity: 0.2, scale: 0.97, duration: 0.4 }, '<0.3')
 				.from(q('[data-fn]'), { opacity: 0, y: 6, stagger: 0.06, duration: 0.3 }, '<0.1')
 				.to(q('[data-line="out"]'), { strokeDashoffset: 0, stagger: 0.03, duration: 0.5 })
-				.to(steps[1], { opacity: 0.3, duration: 0.1 }, '<0.3')
-				.to(steps[2], { opacity: 1, duration: 0.1 }, '<')
-				.from(q('[data-layer="chains"] li'), { opacity: 0.15, y: 10, stagger: 0.04, duration: 0.4 }, '<')
+				.from(q('[data-layer="chains"] li'), { opacity: 0.15, y: 10, stagger: 0.04, duration: 0.4 }, '<0.3')
 				.to({}, { duration: 0.3 });
+
+			// Leaving desktop: every step readable again
+			return () => steps.forEach((el) => ((el as HTMLElement).dataset.active = 'true'));
 		});
 
 		// Mobile: simple reveal, no pin

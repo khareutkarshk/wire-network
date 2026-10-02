@@ -2,15 +2,23 @@
 import { Icon } from 'astro-icon/components';
 import Section from '../ui/Section.astro';
 import Heading from '../ui/Heading.astro';
+import ChainLogo from '../ui/ChainLogo.astro';
+import LifecycleChip from '../ui/LifecycleChip.astro';
 
 const statement =
 	'Blockchains run as sovereign environments. As applications spread across them, liquidity fragments, execution turns uncertain and ownership gets hard to pin down. Wire adds a shared coordination layer that makes cross-chain financial state explicit, queryable and recoverable.';
 
+// Each principle carries a small schematic built from real system parts (chain tiles, lifecycle chips)
 const points = [
-	{ icon: 'ph:stack', title: 'Shared financial state', body: 'One coordination layer records what happened across every connected ecosystem.' },
-	{ icon: 'ph:path', title: 'Deterministic execution', body: 'Transactions follow a defined lifecycle with explicit outcomes.' },
-	{ icon: 'ph:anchor-simple', title: 'Native asset security', body: 'Assets stay on their original chains while Wire coordinates ownership rights.' },
-	{ icon: 'ph:arrow-u-up-left', title: 'Defined recovery', body: 'Failed execution follows an explicit recovery path, never an ambiguous state.' },
+	{ key: 'state', title: 'Shared financial state', body: 'One coordination layer records what happened across every connected ecosystem.' },
+	{ key: 'exec', title: 'Deterministic execution', body: 'Transactions follow a defined lifecycle with explicit outcomes.' },
+	{ key: 'native', title: 'Native asset security', body: 'Assets stay on their original chains while Wire coordinates ownership rights.' },
+	{ key: 'recovery', title: 'Defined recovery', body: 'Failed execution follows an explicit recovery path, never an ambiguous state.' },
+];
+const trio = [
+	{ icon: 'cryptocurrency:eth', name: 'Ethereum' },
+	{ icon: 'cryptocurrency:sol', name: 'Solana' },
+	{ icon: 'cryptocurrency:ada', name: 'Cardano' },
 ];
 ---
 
@@ -22,13 +30,63 @@ const points = [
 		</p>
 	</div>
 
-	<ul class="mt-20 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+	<ul class="principles mt-20 grid gap-px overflow-hidden rounded-panel border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
 		{
 			points.map((p, i) => (
-				<li class:list={['border-t border-line-strong pt-6', i % 2 === 1 && 'lg:mt-12']} data-reveal data-reveal-delay={i * 0.06}>
-					<Icon name={p.icon} class="size-6 text-accent-soft" aria-hidden="true" />
-					<h3 class="mt-5 text-lg font-medium text-fg-1">{p.title}</h3>
-					<p class="mt-2 text-fg-2">{p.body}</p>
+				<li class="principle group flex flex-col bg-ink-950 p-6 md:p-7" data-reveal data-reveal-delay={i * 0.07}>
+					<div class="schematic relative flex h-36 items-center justify-center rounded-control border border-line bg-ink-900" aria-hidden="true">
+						{p.key === 'state' && (
+							<div class="flex w-full flex-col items-center px-6">
+								<div class="flex w-full justify-between">
+									{trio.map((c) => <span class="tile"><ChainLogo icon={c.icon} name={c.name} class="size-4" /></span>)}
+								</div>
+								<svg class="h-8 w-full" viewBox="0 0 100 32" preserveAspectRatio="none">
+									<path d="M12 0 C12 18, 50 14, 50 32 M50 0 V32 M88 0 C88 18, 50 14, 50 32" class="wire" />
+								</svg>
+								<span class="rounded-control border border-accent/40 bg-accent/10 px-3 py-1 font-mono text-mono-xs uppercase tracking-widest text-accent-soft">One state</span>
+							</div>
+						)}
+						{p.key === 'exec' && (
+							<div class="flex w-full flex-col gap-4 px-6">
+								<div class="flex items-center gap-1.5">
+									{[0, 1, 2, 3].map((n) => <span class="step" style={`--d:${n * 120}ms`} />)}
+								</div>
+								<div class="flex items-center justify-between">
+									<span class="font-mono text-mono-xs text-fg-3">Outcome</span>
+									<LifecycleChip state="settled" />
+								</div>
+							</div>
+						)}
+						{p.key === 'native' && (
+							<div class="flex w-full items-center justify-between gap-3 px-6">
+								<div class="flex flex-col items-center gap-2">
+									<span class="tile relative">
+										<ChainLogo icon="cryptocurrency:eth" name="Ethereum" class="size-4" />
+										<span class="lock"><Icon name="ph:lock-simple-fill" class="size-2.5" /></span>
+									</span>
+									<span class="font-mono text-mono-xs text-fg-3">Asset</span>
+								</div>
+								<div class="relative h-px flex-1 border-t border-dashed border-line-strong">
+									<span class="packet" />
+								</div>
+								<div class="flex flex-col items-center gap-2">
+									<span class="tile"><ChainLogo icon="cryptocurrency:sol" name="Solana" class="size-4" /></span>
+									<span class="font-mono text-mono-xs text-accent-soft">Ownership</span>
+								</div>
+							</div>
+						)}
+						{p.key === 'recovery' && (
+							<div class="flex flex-col items-start gap-2.5">
+								<LifecycleChip state="executing" />
+								<div class="flex items-center gap-2 pl-2 text-state-recovering">
+									<Icon name="ph:arrow-elbow-down-right" class="size-4" />
+									<LifecycleChip state="recovering" />
+								</div>
+							</div>
+						)}
+					</div>
+					<h3 class="mt-7 text-[1.3125rem] leading-tight font-medium tracking-[-0.015em] text-fg-1">{p.title}</h3>
+					<p class="mt-2.5 text-fg-2">{p.body}</p>
 				</li>
 			))
 		}
@@ -36,6 +94,100 @@ const points = [
 </Section>
 
 <style>
+	.principle {
+		transition: background-color var(--duration-reveal) var(--ease-out-expo);
+	}
+	.principle:hover {
+		background: var(--color-ink-900);
+	}
+	.schematic {
+		background-image: radial-gradient(var(--color-line) 1px, transparent 1px);
+		background-size: 14px 14px;
+		background-color: var(--color-ink-900);
+		transition: border-color var(--duration-reveal) var(--ease-out-expo);
+	}
+	.principle:hover .schematic {
+		border-color: var(--color-line-strong);
+	}
+	.tile {
+		display: inline-flex;
+		width: 2rem;
+		height: 2rem;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--radius-control);
+		border: 1px solid var(--color-line-strong);
+		background: var(--color-ink-800);
+		color: var(--color-fg-1);
+		box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
+	}
+	.lock {
+		position: absolute;
+		right: -5px;
+		bottom: -5px;
+		display: inline-flex;
+		width: 15px;
+		height: 15px;
+		align-items: center;
+		justify-content: center;
+		border-radius: 4px;
+		background: var(--color-fg-1);
+		color: var(--color-ink-950);
+	}
+	.wire {
+		fill: none;
+		stroke: var(--color-accent);
+		stroke-width: 1px;
+		vector-effect: non-scaling-stroke;
+		opacity: 0.7;
+	}
+	.step {
+		height: 4px;
+		flex: 1;
+		border-radius: 1px;
+		background: var(--color-accent);
+	}
+	.step:last-child {
+		background: var(--color-state-settled);
+	}
+	.packet {
+		position: absolute;
+		top: -4px;
+		left: calc(100% - 7px);
+		width: 7px;
+		height: 7px;
+		border-radius: 2px;
+		background: var(--color-fg-1);
+		transform: rotate(45deg);
+		box-shadow: 0 0 0 3px rgb(47 107 255 / 0.25);
+	}
+	/* Hover replays each schematic once (feedback); nothing loops */
+	@media (prefers-reduced-motion: no-preference) {
+		.principle:hover .step {
+			animation: fill-step 0.5s var(--ease-out-expo) both;
+			animation-delay: var(--d);
+		}
+		.principle:hover .packet {
+			animation: travel 1.1s var(--ease-out-expo) both;
+		}
+		.principle:hover .wire {
+			stroke-dasharray: 60;
+			animation: draw 0.9s var(--ease-out-expo) both;
+		}
+	}
+	@keyframes fill-step {
+		from { transform: scaleX(0); transform-origin: left; }
+		to { transform: scaleX(1); transform-origin: left; }
+	}
+	@keyframes travel {
+		from { left: 0; }
+		to { left: calc(100% - 7px); }
+	}
+	@keyframes draw {
+		from { stroke-dashoffset: 60; }
+		to { stroke-dashoffset: 0; }
+	}
+
 	/* Words start dim and light up with scroll (reading pace). Full color without JS or motion. */
 	:global(html.motion-ok) .lit-word {
 		opacity: 0.22;
