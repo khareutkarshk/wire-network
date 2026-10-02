@@ -1,0 +1,127 @@
+---
+import { Icon } from 'astro-icon/components';
+import Container from '../ui/Container.astro';
+
+const primitives = [
+	{
+		mark: 'UPAP',
+		name: 'Universal Polymorphic Address Protocol',
+		body: 'A standard protocol for transaction workflows across different blockchain environments.',
+		note: 'A common transaction language for multi-chain infrastructure.',
+		icon: 'ph:translate',
+		surface: 'tint',
+	},
+	{
+		mark: 'WNS',
+		name: 'Wire Name Service',
+		body: 'A decentralized routing protocol built around UPAP to enable interoperability across connected ecosystems.',
+		note: 'Routing, identity and interoperability in one service.',
+		icon: 'ph:signpost',
+		surface: 'plain',
+	},
+	{
+		mark: 'SSO',
+		name: 'Crypto SSO',
+		body: 'A unified authentication and transaction entry point that cuts the friction of working across many chains.',
+		note: 'One entry point. Multiple chains.',
+		icon: 'ph:key',
+		surface: 'grid',
+	},
+	{
+		mark: 'HW',
+		name: 'Trustless hardware',
+		body: 'A verifiable, auditable hardware stack built around open-source firmware.',
+		note: 'Infrastructure anyone can inspect and verify independently.',
+		icon: 'ph:cpu',
+		surface: 'plain',
+	},
+];
+---
+
+<section id="primitives" class="primitives relative overflow-hidden border-t border-line" aria-labelledby="primitives-title">
+	<div class="prim-pin flex min-h-[100dvh] flex-col justify-center gap-12 py-20 lg:py-16">
+		<Container>
+			<div class="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+				<h2 id="primitives-title" class="max-w-[18ch] text-h2 font-medium text-fg-1" data-split>The building blocks of universal transactions</h2>
+				<p class="hidden font-mono text-mono-s text-fg-3 lg:block" aria-hidden="true">
+					<span data-prim-count>1</span> / {primitives.length}
+				</p>
+			</div>
+		</Container>
+
+		<div class="prim-viewport">
+			<ul class="prim-track flex flex-col gap-4 px-4 md:px-6 lg:w-max lg:flex-row lg:gap-5 lg:pr-[10vw] lg:pl-[max(1.5rem,calc((100vw-1320px)/2+1.5rem))]">
+				{primitives.map((p) => (
+					<li class:list={['prim-card panel-edge relative flex flex-col overflow-hidden rounded-panel border border-line p-7 md:p-9 lg:h-[30rem] lg:w-[34rem]', `prim-${p.surface}`]}>
+						<div class="flex items-start justify-between">
+							<span class="font-mono text-[clamp(3.5rem,2.5rem+3vw,5.5rem)] leading-none font-medium tracking-[-0.04em] text-fg-1">{p.mark}</span>
+							<Icon name={p.icon} class="size-7 text-accent-soft" aria-hidden="true" />
+						</div>
+						<div class="mt-auto pt-12">
+							<h3 class="text-h3 font-medium text-fg-1">{p.name}</h3>
+							<p class="mt-3 max-w-[44ch] text-fg-2">{p.body}</p>
+							<p class="mt-6 border-t border-line pt-4 text-sm text-fg-3">{p.note}</p>
+						</div>
+					</li>
+				))}
+			</ul>
+		</div>
+	</div>
+</section>
+
+<style>
+	.prim-plain { background: var(--color-ink-900); }
+	.prim-tint {
+		background:
+			radial-gradient(120% 90% at 100% 0%, rgb(47 107 255 / 0.16), transparent 60%),
+			var(--color-ink-900);
+	}
+	.prim-grid {
+		background-color: var(--color-ink-900);
+		background-image:
+			linear-gradient(var(--color-line) 1px, transparent 1px),
+			linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+		background-size: 28px 28px;
+	}
+</style>
+
+<script>
+	import { gsap, prefersReducedMotion } from '../../lib/motion';
+
+	const root = document.querySelector<HTMLElement>('.primitives');
+	if (root && !prefersReducedMotion()) {
+		const mm = gsap.matchMedia();
+		// Desktop: vertical scroll pans the track (horizontal-pan skeleton: pin at top, scrub)
+		mm.add('(min-width: 1024px)', () => {
+			const track = root.querySelector<HTMLElement>('.prim-track')!;
+			const count = root.querySelector<HTMLElement>('[data-prim-count]');
+			const cards = root.querySelectorAll('.prim-card');
+			const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
+			gsap.to(track, {
+				x: () => -distance(),
+				ease: 'none',
+				scrollTrigger: {
+					trigger: root,
+					start: 'top top',
+					end: () => `+=${distance()}`,
+					pin: '.prim-pin',
+					scrub: 0.8,
+					invalidateOnRefresh: true,
+					onUpdate: (self) => {
+						if (count) count.textContent = String(Math.min(cards.length, Math.round(self.progress * (cards.length - 1)) + 1));
+					},
+				},
+			});
+		});
+		mm.add('(max-width: 1023px)', () => {
+			gsap.from(root.querySelectorAll('.prim-card'), {
+				opacity: 0,
+				y: 20,
+				stagger: 0.08,
+				duration: 0.6,
+				ease: 'expo.out',
+				scrollTrigger: { trigger: root, start: 'top 70%', once: true },
+			});
+		});
+	}
+</script>

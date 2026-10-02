@@ -1,11 +1,29 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Base from '../layouts/Base.astro';
+import Hero from '../components/hero/Hero.astro';
+import NetworkBar from '../components/sections/NetworkBar.astro';
+import Problem from '../components/sections/Problem.astro';
+import Utl from '../components/sections/Utl.astro';
+import Lifecycle from '../components/sections/Lifecycle.astro';
+import Ownership from '../components/sections/Ownership.astro';
+import Agents from '../components/sections/Agents.astro';
+import Primitives from '../components/sections/Primitives.astro';
+import Performance from '../components/sections/Performance.astro';
+import DevTeaser from '../components/sections/DevTeaser.astro';
+import Closing from '../components/sections/Closing.astro';
+// Section blueprint and rationale: docs/site-plan.md
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<Base>
+	<Hero />
+	<NetworkBar />
+	<Problem />
+	<Utl />
+	<Lifecycle />
+	<Ownership />
+	<Agents />
+	<Primitives />
+	<Performance />
+	<DevTeaser />
+	<Closing />
+</Base>

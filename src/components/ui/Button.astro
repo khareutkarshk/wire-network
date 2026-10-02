@@ -1,0 +1,69 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+	href?: string;
+	variant?: 'primary' | 'secondary' | 'ghost';
+	size?: 'md' | 'sm';
+	external?: boolean;
+	disabled?: boolean;
+	type?: 'button' | 'submit';
+	class?: string;
+	[key: string]: unknown;
+}
+
+const {
+	href,
+	variant = 'primary',
+	size = 'md',
+	external = false,
+	disabled = false,
+	type = 'button',
+	class: className,
+	...rest
+} = Astro.props;
+
+// Primary is platinum-on-ink. Cobalt is never a button fill: the accent stays rare.
+const variants = {
+	primary: 'bg-fg-1 text-ink-950 hover:bg-white',
+	secondary: 'border border-line-strong text-fg-1 hover:border-fg-3 hover:bg-ink-800',
+	ghost: 'text-fg-1 hover:bg-ink-800',
+};
+const sizes = {
+	md: 'h-11 px-5 text-[0.9375rem] gap-2',
+	sm: 'h-9 px-3.5 text-sm gap-1.5',
+};
+
+const classes = [
+	'group/btn relative inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-control font-medium',
+	'transition-[background-color,border-color,transform] duration-(--duration-ui) ease-out-expo',
+	'active:translate-y-px active:scale-[0.985]',
+	'aria-disabled:pointer-events-none aria-disabled:opacity-40',
+	variants[variant],
+	sizes[size],
+	className,
+];
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+	class:list={classes}
+	href={disabled ? undefined : href}
+	type={href ? undefined : type}
+	aria-disabled={disabled ? 'true' : undefined}
+	target={external ? '_blank' : undefined}
+	rel={external ? 'noopener noreferrer' : undefined}
+	{...rest}
+>
+	<slot />
+	{
+		external ? (
+			<Icon name="ph:arrow-up-right" class="size-4 transition-transform duration-(--duration-ui) ease-out-expo group-hover/btn:-translate-y-px group-hover/btn:translate-x-px" aria-hidden="true" />
+		) : (
+			variant === 'primary' && (
+				<Icon name="ph:arrow-right" class="size-4 transition-transform duration-(--duration-ui) ease-out-expo group-hover/btn:translate-x-0.5" aria-hidden="true" />
+			)
+		)
+	}
+	{external && <span class="sr-only">(opens in a new tab)</span>}
+</Tag>

@@ -1,0 +1,19 @@
+---
+interface Props {
+	value: string;
+	label: string;
+	size?: 'xl' | 'md';
+	class?: string;
+}
+const { value, label, size = 'md', class: className } = Astro.props;
+---
+
+<div class:list={['flex flex-col', size === 'xl' ? 'gap-5' : 'gap-2', className]}>
+	<span
+		class:list={[
+			'font-medium tabular-nums text-fg-1',
+			size === 'xl' ? 'text-[clamp(4rem,2rem+8vw,8.5rem)] leading-[0.9] tracking-[-0.045em]' : 'text-h3',
+		]}>{value}</span
+	>
+	<span class="font-mono text-mono-s text-fg-3">{label}</span>
+</div>

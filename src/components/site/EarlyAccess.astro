@@ -1,0 +1,109 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<!-- TODO: wire the submit to the real early-access endpoint (form service, CRM, or API). -->
+<dialog id="early-access" class="ea m-auto w-[min(30rem,calc(100vw-2rem))] rounded-panel border border-line-strong bg-ink-900 p-0 text-fg-2 backdrop:bg-ink-950/80 backdrop:backdrop-blur-sm" aria-labelledby="ea-title">
+	<div class="panel-edge p-7 md:p-8">
+		<div class="flex items-start justify-between gap-6">
+			<h2 id="ea-title" class="text-h3 font-medium text-fg-1">Get early access</h2>
+			<button type="button" class="-mt-1 -mr-2 inline-flex size-9 items-center justify-center rounded-control text-fg-2 hover:bg-ink-800 hover:text-fg-1" data-ea-close>
+				<Icon name="ph:x" class="size-5" aria-hidden="true" />
+				<span class="sr-only">Close</span>
+			</button>
+		</div>
+
+		<form class="mt-3" novalidate data-ea-form>
+			<p class="text-fg-2">Hear first when mainnet opens in October 2026, plus developer access ahead of launch.</p>
+			<div class="mt-7 flex flex-col gap-2">
+				<label for="ea-email" class="text-sm font-medium text-fg-1">Work email</label>
+				<input
+					id="ea-email"
+					name="email"
+					type="email"
+					autocomplete="email"
+					required
+					aria-describedby="ea-help ea-error"
+					class="h-11 rounded-control border border-line-strong bg-ink-950 px-3.5 text-fg-1 placeholder:text-fg-3 aria-[invalid=true]:border-state-recovering focus-visible:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+					placeholder="you@company.com"
+				/>
+				<p id="ea-help" class="text-sm text-fg-3">One email at launch. No newsletter.</p>
+				<p id="ea-error" class="hidden text-sm text-state-recovering" role="alert">Enter a valid email address.</p>
+			</div>
+			<button type="submit" class="mt-7 inline-flex h-11 w-full items-center justify-center gap-2 rounded-control bg-fg-1 font-medium text-ink-950 transition-transform duration-(--duration-ui) hover:bg-white active:translate-y-px disabled:opacity-60" data-ea-submit>
+				<span data-ea-label>Request access</span>
+			</button>
+		</form>
+
+		<div class="mt-6 hidden" data-ea-done role="status">
+			<div class="flex items-center gap-3">
+				<Icon name="ph:check-circle" class="size-6 text-state-settled" aria-hidden="true" />
+				<p class="text-lg font-medium text-fg-1">You're on the list</p>
+			</div>
+			<p class="mt-3 text-fg-2">We'll email <span class="text-fg-1" data-ea-echo></span> when access opens.</p>
+		</div>
+	</div>
+</dialog>
+
+<style>
+	.ea[open] {
+		animation: ea-in var(--duration-reveal) var(--ease-out-expo);
+	}
+	@keyframes ea-in {
+		from { opacity: 0; transform: translateY(10px) scale(0.985); }
+	}
+</style>
+
+<script>
+	import { lenisInstance } from '../../lib/motion';
+
+	const dialog = document.getElementById('early-access') as HTMLDialogElement;
+	const form = dialog.querySelector<HTMLFormElement>('[data-ea-form]')!;
+	const input = form.querySelector<HTMLInputElement>('input')!;
+	const error = dialog.querySelector<HTMLElement>('#ea-error')!;
+	const done = dialog.querySelector<HTMLElement>('[data-ea-done]')!;
+	const submit = form.querySelector<HTMLButtonElement>('[data-ea-submit]')!;
+	let opener: HTMLElement | null = null;
+
+	const open = (from: HTMLElement) => {
+		opener = from;
+		lenisInstance()?.stop();
+		dialog.showModal();
+		input.focus();
+	};
+	dialog.addEventListener('close', () => {
+		lenisInstance()?.start();
+		opener?.focus();
+	});
+	dialog.querySelector('[data-ea-close]')!.addEventListener('click', () => dialog.close());
+	dialog.addEventListener('click', (e) => e.target === dialog && dialog.close());
+
+	document.querySelectorAll<HTMLAnchorElement>('a[href="#early-access"]').forEach((a) =>
+		a.addEventListener('click', (e) => {
+			e.preventDefault();
+			open(a);
+		}),
+	);
+
+	const setError = (on: boolean) => {
+		input.setAttribute('aria-invalid', String(on));
+		error.classList.toggle('hidden', !on);
+	};
+	input.addEventListener('input', () => input.getAttribute('aria-invalid') === 'true' && setError(!input.validity.valid));
+
+	form.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		if (!input.validity.valid) {
+			setError(true);
+			input.focus();
+			return;
+		}
+		setError(false);
+		submit.disabled = true;
+		form.querySelector('[data-ea-label]')!.textContent = 'Sending…';
+		await new Promise((r) => setTimeout(r, 600)); // TODO: replace with the real request
+		dialog.querySelector('[data-ea-echo]')!.textContent = input.value;
+		form.classList.add('hidden');
+		done.classList.remove('hidden');
+	});
+</script>

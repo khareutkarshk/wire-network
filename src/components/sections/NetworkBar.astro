@@ -1,0 +1,59 @@
+---
+import ChainLogo from '../ui/ChainLogo.astro';
+import Container from '../ui/Container.astro';
+import { CHAINS } from '../../lib/site';
+
+// The page's only marquee: breadth of networks, nothing to read individually.
+const loop = [...CHAINS, ...CHAINS];
+---
+
+<section aria-label="Connected networks" class="border-y border-line bg-ink-900">
+	<Container class="flex flex-col gap-5 py-6 md:flex-row md:items-center md:gap-10">
+		<p class="shrink-0 text-sm text-fg-2">
+			<span class="font-medium text-fg-1">300+ networks</span> coordinated through one layer
+		</p>
+		<div class="marquee relative min-w-0 flex-1 overflow-hidden">
+			<ul class="marquee-track flex w-max items-center gap-12">
+				{
+					loop.map((c, i) => (
+						<li class="flex items-center gap-2.5 text-fg-2" aria-hidden={i >= CHAINS.length ? 'true' : undefined}>
+							<ChainLogo icon={c.icon} name={c.name} class="size-5 text-fg-1" />
+							<span class="whitespace-nowrap text-sm">{c.name}</span>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</Container>
+</section>
+
+<style>
+	.marquee {
+		mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+	}
+	.marquee-track {
+		padding-right: 3rem;
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.marquee-track {
+			animation: marquee 38s linear infinite;
+		}
+		.marquee:hover .marquee-track {
+			animation-play-state: paused;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.marquee-track {
+			flex-wrap: wrap;
+			row-gap: 1rem;
+		}
+		.marquee-track > [aria-hidden='true'] {
+			display: none;
+		}
+	}
+	@keyframes marquee {
+		to {
+			transform: translateX(-50%);
+		}
+	}
+</style>

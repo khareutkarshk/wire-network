@@ -1,0 +1,185 @@
+@import 'tailwindcss';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+/* ---------------------------------------------------------------------------
+   Wire design tokens. Source of truth: docs/design-system.md
+   Evolved from the live wire.network palette (obsidian / platinum / cobalt).
+   --------------------------------------------------------------------------- */
+
+@font-face {
+	font-family: 'Switzer';
+	src: url('/fonts/switzer-400.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Switzer';
+	src: url('/fonts/switzer-500.woff2') format('woff2');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Switzer';
+	src: url('/fonts/switzer-600.woff2') format('woff2');
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+
+@theme {
+	/* Reset Tailwind's default palette so only Wire tokens exist */
+	--color-*: initial;
+
+	/* Surfaces */
+	--color-ink-950: #05070a;
+	--color-ink-900: #0b1016;
+	--color-ink-800: #141b24;
+	--color-ink-700: #1d2631;
+
+	/* Lines (platinum at low alpha) */
+	--color-line: rgb(232 237 244 / 0.08);
+	--color-line-strong: rgb(232 237 244 / 0.16);
+
+	/* Foreground */
+	--color-fg-1: #e8edf4;
+	--color-fg-2: #a9b3c0;
+	--color-fg-3: #6e7885;
+
+	/* The one accent */
+	--color-accent: #2f6bff;
+	--color-accent-soft: #7ea5ff;
+
+	/* Semantic lifecycle states (lifecycle components only) */
+	--color-state-settled: #44e2a1;
+	--color-state-recovering: #e68e35;
+
+	--color-transparent: transparent;
+	--color-current: currentColor;
+
+	/* Type */
+	--font-sans: 'Switzer', ui-sans-serif, system-ui, sans-serif;
+	--font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+	--text-display: clamp(2.75rem, 1.6rem + 4.2vw, 4.5rem);
+	--text-display--line-height: 1.02;
+	--text-display--letter-spacing: -0.035em;
+	--text-h2: clamp(2rem, 1.45rem + 2vw, 3rem);
+	--text-h2--line-height: 1.08;
+	--text-h2--letter-spacing: -0.03em;
+	--text-h3: 1.5rem;
+	--text-h3--line-height: 1.25;
+	--text-h3--letter-spacing: -0.015em;
+	--text-body-l: 1.1875rem;
+	--text-body-l--line-height: 1.6;
+	--text-body: 1rem;
+	--text-body--line-height: 1.6;
+	--text-mono-s: 0.8125rem;
+	--text-mono-s--line-height: 1.4;
+	--text-mono-xs: 0.6875rem;
+	--text-mono-xs--line-height: 1.3;
+
+	/* Shape: controls 6px, panels/media 14px */
+	--radius-control: 6px;
+	--radius-panel: 14px;
+
+	/* Motion */
+	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+	--duration-ui: 200ms;
+	--duration-reveal: 600ms;
+	--duration-hero: 900ms;
+
+	/* Layout */
+	--container-page: 1320px;
+	--container-prose: 62ch;
+}
+
+/* Brushed-metal gradient. One use per page: the wordmark. */
+@utility text-metal {
+	background: linear-gradient(135deg, #f9fbfd 0%, #e1e6ec 18%, #adb5bf 36%, #f0f3f7 52%, #979fa8 72%, #d7dce2 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+@utility panel-edge {
+	box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+}
+
+@layer base {
+	:root {
+		color-scheme: dark;
+		--z-grain: 60;
+		--z-nav: 50;
+		--z-sheet: 55;
+	}
+
+	html {
+		background: var(--color-ink-950);
+		color: var(--color-fg-2);
+		font-family: var(--font-sans);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-rendering: optimizeLegibility;
+		font-feature-settings: 'ss01', 'cv11';
+	}
+
+	body {
+		min-height: 100dvh;
+		background: var(--color-ink-950);
+	}
+
+	h1, h2, h3, h4 {
+		color: var(--color-fg-1);
+		font-weight: 500;
+		text-wrap: balance;
+	}
+
+	p {
+		text-wrap: pretty;
+	}
+
+	[id] {
+		scroll-margin-top: 5rem;
+	}
+
+	::selection {
+		background: rgb(47 107 255 / 0.35);
+		color: var(--color-fg-1);
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 3px;
+		border-radius: 4px;
+	}
+
+	/* Lenis */
+	html.lenis, html.lenis body { height: auto; }
+	.lenis.lenis-smooth { scroll-behavior: auto !important; }
+	.lenis.lenis-stopped { overflow: hidden; }
+
+	/* Elements that GSAP reveals start hidden only when JS + motion are on */
+	html.motion-ok [data-reveal] { opacity: 0; }
+	html.motion-ok [data-split] { visibility: hidden; }
+}
+
+/* Film grain: fixed, non-interactive, never on scrolling containers */
+.grain {
+	position: fixed;
+	inset: 0;
+	z-index: var(--z-grain);
+	pointer-events: none;
+	opacity: 0.035;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}

@@ -1,0 +1,58 @@
+---
+import { Icon } from 'astro-icon/components';
+import Section from '../ui/Section.astro';
+import Heading from '../ui/Heading.astro';
+
+const statement =
+	'Blockchains run as sovereign environments. As applications spread across them, liquidity fragments, execution turns uncertain and ownership gets hard to pin down. Wire adds a shared coordination layer that makes cross-chain financial state explicit, queryable and recoverable.';
+
+const points = [
+	{ icon: 'ph:stack', title: 'Shared financial state', body: 'One coordination layer records what happened across every connected ecosystem.' },
+	{ icon: 'ph:path', title: 'Deterministic execution', body: 'Transactions follow a defined lifecycle with explicit outcomes.' },
+	{ icon: 'ph:anchor-simple', title: 'Native asset security', body: 'Assets stay on their original chains while Wire coordinates ownership rights.' },
+	{ icon: 'ph:arrow-u-up-left', title: 'Defined recovery', body: 'Failed execution follows an explicit recovery path, never an ambiguous state.' },
+];
+---
+
+<Section id="about" labelledby="about-title">
+	<div class="grid gap-y-12 md:grid-cols-12">
+		<Heading id="about-title" split class="md:col-span-8">The problem isn't messaging. It's ownership.</Heading>
+		<p class="lit-text text-[clamp(1.375rem,1rem+1.4vw,2.125rem)] leading-[1.35] tracking-[-0.02em] text-fg-1 md:col-span-10 md:col-start-3" data-lit>
+			{statement.split(' ').map((w) => <span class="lit-word">{w} </span>)}
+		</p>
+	</div>
+
+	<ul class="mt-20 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+		{
+			points.map((p, i) => (
+				<li class:list={['border-t border-line-strong pt-6', i % 2 === 1 && 'lg:mt-12']} data-reveal data-reveal-delay={i * 0.06}>
+					<Icon name={p.icon} class="size-6 text-accent-soft" aria-hidden="true" />
+					<h3 class="mt-5 text-lg font-medium text-fg-1">{p.title}</h3>
+					<p class="mt-2 text-fg-2">{p.body}</p>
+				</li>
+			))
+		}
+	</ul>
+</Section>
+
+<style>
+	/* Words start dim and light up with scroll (reading pace). Full color without JS or motion. */
+	:global(html.motion-ok) .lit-word {
+		opacity: 0.22;
+	}
+</style>
+
+<script>
+	import { gsap, prefersReducedMotion } from '../../lib/motion';
+
+	if (!prefersReducedMotion()) {
+		document.querySelectorAll<HTMLElement>('[data-lit]').forEach((el) => {
+			gsap.to(el.querySelectorAll('.lit-word'), {
+				opacity: 1,
+				stagger: 0.1,
+				ease: 'none',
+				scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 45%', scrub: true },
+			});
+		});
+	}
+</script>

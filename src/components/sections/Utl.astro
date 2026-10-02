@@ -1,0 +1,164 @@
+---
+import Container from '../ui/Container.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import ChainLogo from '../ui/ChainLogo.astro';
+import { CHAINS } from '../../lib/site';
+
+const apps = ['DEXs', 'Wallets', 'DeFi protocols', 'AI agents', 'Financial apps'];
+const functions = ['Routing', 'Validation', 'Settlement', 'Risk control'];
+const steps = [
+	{ title: 'Applications', body: 'DEXs, wallets, DeFi protocols, trading systems and autonomous agents connect once.' },
+	{ title: 'Wire UTL', body: 'Routes, validates and settles each transaction, with risk control on every path.' },
+	{ title: 'Blockchains', body: 'Ethereum, Solana, Cardano and 300+ more. Assets never leave their native chain.' },
+];
+
+// Connector geometry (viewBox 1000 x 100): fan in from 5 apps, fan out to 8 chain slots.
+const fanIn = [100, 300, 500, 700, 900].map((x, i) => {
+	const tx = 380 + i * 60;
+	return `M${x} 0 C${x} 55, ${tx} 45, ${tx} 100`;
+});
+const fanOut = Array.from({ length: 8 }, (_, i) => {
+	const x = 62.5 + i * 125;
+	const sx = 360 + i * 40;
+	return `M${sx} 0 C${sx} 55, ${x} 45, ${x} 100`;
+});
+---
+
+<section id="utl" class="utl relative" aria-labelledby="utl-title">
+	<div class="utl-pin flex min-h-[100dvh] items-center py-20 lg:py-0">
+		<Container>
+			<div class="grid gap-14 lg:grid-cols-12 lg:gap-10">
+				<!-- Story -->
+				<div class="lg:col-span-4 lg:self-center">
+					<Eyebrow>Universal Transaction Layer</Eyebrow>
+					<h2 id="utl-title" class="mt-5 text-h2 font-medium text-fg-1">One layer between applications and chains</h2>
+					<ol class="mt-10 flex flex-col gap-6">
+						{
+							steps.map((s, i) => (
+								<li class="utl-step border-l border-line-strong pl-5" data-step={i}>
+									<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-accent-soft">{s.title}</p>
+									<p class="mt-2 max-w-[36ch] text-fg-2">{s.body}</p>
+								</li>
+							))
+						}
+					</ol>
+				</div>
+
+				<!-- Diagram -->
+				<figure class="lg:col-span-8 lg:self-center" aria-label="Applications connect to the Wire UTL, which coordinates execution across blockchains">
+					<ul class="grid grid-cols-2 gap-2 sm:grid-cols-5" data-layer="apps">
+						{apps.map((a) => <li class="flex h-12 items-center justify-center rounded-control border border-line-strong bg-ink-900 px-2 text-center text-sm text-fg-1">{a}</li>)}
+					</ul>
+
+					<svg class="utl-lines hidden h-20 w-full sm:block" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
+						{fanIn.map((d) => <path d={d} class="utl-base" />)}
+						{fanIn.map((d) => <path d={d} pathLength="1" class="utl-live" data-line="in" />)}
+					</svg>
+					<div class="mx-auto h-8 w-px bg-line-strong sm:hidden" aria-hidden="true"></div>
+
+					<div class="utl-core panel-edge relative overflow-hidden rounded-panel border border-accent/40 p-5 md:p-6" data-layer="core">
+						<div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+							<div>
+								<p class="text-h3 font-medium text-fg-1">Wire UTL</p>
+								<p class="mt-1 font-mono text-mono-s text-fg-3">Built on Wire L1, UPAP and WNS</p>
+							</div>
+							<ul class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+								{functions.map((f) => <li class="rounded-control border border-line-strong bg-ink-950/60 px-3 py-2 text-center font-mono text-mono-s text-fg-1" data-fn>{f}</li>)}
+							</ul>
+						</div>
+					</div>
+
+					<svg class="utl-lines hidden h-20 w-full sm:block" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
+						{fanOut.map((d) => <path d={d} class="utl-base" />)}
+						{fanOut.map((d) => <path d={d} pathLength="1" class="utl-live" data-line="out" />)}
+					</svg>
+					<div class="mx-auto h-8 w-px bg-line-strong sm:hidden" aria-hidden="true"></div>
+
+					<ul class="grid grid-cols-4 gap-2 sm:grid-cols-8" data-layer="chains">
+						{
+							CHAINS.map((c) => (
+								<li class="flex aspect-square flex-col items-center justify-center gap-2 rounded-control border border-line bg-ink-900 text-fg-1">
+									<ChainLogo icon={c.icon} name={c.name} class="size-6" />
+									<span class="text-[0.6875rem] text-fg-3">{c.name}</span>
+								</li>
+							))
+						}
+						<li class="flex aspect-square flex-col items-center justify-center rounded-control border border-dashed border-line-strong text-center">
+							<span class="text-lg font-medium text-fg-1">300+</span>
+							<span class="text-[0.6875rem] text-fg-3">networks</span>
+						</li>
+					</ul>
+				</figure>
+			</div>
+		</Container>
+	</div>
+</section>
+
+<style>
+	.utl-core {
+		background:
+			radial-gradient(80% 140% at 50% 0%, rgb(47 107 255 / 0.18), transparent 70%),
+			var(--color-ink-900);
+	}
+	.utl-base,
+	.utl-live {
+		fill: none;
+		vector-effect: non-scaling-stroke;
+		stroke-width: 1px;
+	}
+	.utl-base {
+		stroke: var(--color-line-strong);
+	}
+	.utl-live {
+		stroke: var(--color-accent);
+		stroke-width: 1.5px;
+		stroke-dasharray: 1;
+		stroke-dashoffset: 0;
+	}
+</style>
+
+<script>
+	import { gsap, prefersReducedMotion } from '../../lib/motion';
+
+	const root = document.querySelector<HTMLElement>('.utl');
+	if (root && !prefersReducedMotion()) {
+		const mm = gsap.matchMedia();
+
+		// Desktop: pin and scrub the assembly (storytelling)
+		mm.add('(min-width: 1024px)', () => {
+			const q = gsap.utils.selector(root);
+			const steps = q('[data-step]');
+			const tl = gsap.timeline({
+				defaults: { ease: 'none' },
+				scrollTrigger: { trigger: root, start: 'top top', end: '+=180%', pin: '.utl-pin', scrub: 0.6 },
+			});
+			gsap.set(steps, { opacity: 0.3 });
+			gsap.set(q('[data-line]'), { strokeDashoffset: 1 });
+
+			tl.set(steps[0], { opacity: 1 })
+				.from(q('[data-layer="apps"] li'), { opacity: 0.15, y: -10, stagger: 0.05, duration: 0.4 })
+				.to(q('[data-line="in"]'), { strokeDashoffset: 0, stagger: 0.04, duration: 0.5 })
+				.to(steps[0], { opacity: 0.3, duration: 0.1 }, '<0.3')
+				.to(steps[1], { opacity: 1, duration: 0.1 }, '<')
+				.from(q('[data-layer="core"]'), { opacity: 0.2, scale: 0.97, duration: 0.4 }, '<')
+				.from(q('[data-fn]'), { opacity: 0, y: 6, stagger: 0.06, duration: 0.3 }, '<0.1')
+				.to(q('[data-line="out"]'), { strokeDashoffset: 0, stagger: 0.03, duration: 0.5 })
+				.to(steps[1], { opacity: 0.3, duration: 0.1 }, '<0.3')
+				.to(steps[2], { opacity: 1, duration: 0.1 }, '<')
+				.from(q('[data-layer="chains"] li'), { opacity: 0.15, y: 10, stagger: 0.04, duration: 0.4 }, '<')
+				.to({}, { duration: 0.3 });
+		});
+
+		// Mobile: simple reveal, no pin
+		mm.add('(max-width: 1023px)', () => {
+			gsap.from(root.querySelectorAll('[data-layer]'), {
+				opacity: 0,
+				y: 16,
+				stagger: 0.12,
+				duration: 0.6,
+				ease: 'expo.out',
+				scrollTrigger: { trigger: root, start: 'top 75%', once: true },
+			});
+		});
+	}
+</script>

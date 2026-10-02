@@ -1,0 +1,40 @@
+---
+import { Icon } from 'astro-icon/components';
+import Section from '../ui/Section.astro';
+import Button from '../ui/Button.astro';
+import TextLink from '../ui/TextLink.astro';
+import { STACK } from '../../lib/stack';
+import { GITHUB_HREF } from '../../lib/site';
+
+const capabilities = ['Smart contracts', 'WASM execution', 'APIs', 'SDKs', 'CLI tooling', 'Block explorer'];
+---
+
+<Section id="developers" labelledby="dev-title" tone="raised">
+	<div class="grid gap-14 lg:grid-cols-12 lg:gap-10">
+		<div class="lg:col-span-4">
+			<h2 id="dev-title" class="text-h2 font-medium text-fg-1" data-split>Build once. Reach multiple ecosystems.</h2>
+			<p class="mt-5 max-w-[40ch] text-fg-2" data-reveal>
+				Coordinate assets, ownership and execution across chains from one toolchain, built on the AntelopeIO lineage.
+			</p>
+			<ul class="mt-8 flex flex-wrap gap-2" data-reveal data-reveal-delay="0.06">
+				{capabilities.map((c) => <li class="rounded-control border border-line-strong px-2.5 py-1 text-sm text-fg-2">{c}</li>)}
+			</ul>
+			<div class="mt-10 flex flex-wrap items-center gap-5" data-reveal data-reveal-delay="0.12">
+				<Button href="/developers" variant="secondary">Build on Wire</Button>
+				<TextLink href={GITHUB_HREF} external>GitHub</TextLink>
+			</div>
+		</div>
+
+		<ul class="border-t border-line-strong lg:col-span-7 lg:col-start-6">
+			{STACK.map((s) => (
+				<li class="border-b border-line">
+					<a href="/developers#stack" class="stack-row group grid grid-cols-[7.5rem_1fr_auto] items-center gap-4 py-5 md:grid-cols-[10rem_1fr_auto] md:py-6">
+						<span class="font-mono text-body-l text-fg-1">{s.name}</span>
+						<span class="text-fg-2 transition-colors duration-(--duration-ui) group-hover:text-fg-1">{s.role}</span>
+						<Icon name="ph:arrow-right" class="size-4 -translate-x-1 text-fg-3 opacity-0 transition-[opacity,transform] duration-(--duration-ui) ease-out-expo group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:opacity-100" aria-hidden="true" />
+					</a>
+				</li>
+			))}
+		</ul>
+	</div>
+</Section>

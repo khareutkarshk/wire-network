@@ -1,0 +1,79 @@
+---
+import Section from '../ui/Section.astro';
+import Eyebrow from '../ui/Eyebrow.astro';
+import Button from '../ui/Button.astro';
+import { EARLY_ACCESS_HREF } from '../../lib/site';
+
+const outcomes = [
+	{ who: 'For people', what: 'Reliable financial execution across ecosystems.' },
+	{ who: 'For applications', what: 'A shared execution and ownership layer.' },
+	{ who: 'For AI agents', what: 'Deterministic, machine-readable financial state.' },
+];
+---
+
+<Section id="vision" labelledby="vision-title">
+	<h2 id="vision-title" class="max-w-[22ch] text-h2 font-medium text-fg-1" data-split>A multi-chain world needs a shared financial state</h2>
+
+	<ul class="mt-14 border-t border-line-strong">
+		{outcomes.map((o, i) => (
+			<li class="grid gap-2 border-b border-line py-7 md:grid-cols-12 md:items-baseline md:gap-10 md:py-9" data-reveal data-reveal-delay={i * 0.06}>
+				<p class="font-mono text-mono-s text-fg-3 md:col-span-3">{o.who}</p>
+				<p class="text-[clamp(1.5rem,1rem+1.8vw,2.5rem)] leading-[1.15] tracking-[-0.025em] text-fg-1 md:col-span-9">{o.what}</p>
+			</li>
+		))}
+	</ul>
+
+	<!-- Final CTA + roadmap -->
+	<div class="cta panel-edge relative mt-24 overflow-hidden rounded-panel border border-line p-8 md:p-14">
+		<div class="grid gap-12 lg:grid-cols-12">
+			<div class="lg:col-span-7">
+				<Eyebrow>Mainnet launches October 2026</Eyebrow>
+				<h2 class="mt-5 text-h2 font-medium text-fg-1">Build on the financial control plane</h2>
+				<p class="mt-5 max-w-[48ch] text-body-l text-fg-2">
+					The next generation of applications will be multi-chain, autonomous and machine-driven. Wire gives them deterministic financial execution.
+				</p>
+				<div class="mt-10 flex flex-wrap gap-3">
+					<Button href={EARLY_ACCESS_HREF}>Get Early Access</Button>
+					<Button href="/developers" variant="secondary">Build on Wire</Button>
+				</div>
+			</div>
+
+			<div class="relative self-center lg:col-span-4 lg:col-start-9" data-roadmap>
+				<div class="absolute top-2 bottom-2 left-1.25 w-px bg-line-strong" aria-hidden="true">
+					<div class="roadmap-fill h-1/2 w-px origin-top bg-accent"></div>
+				</div>
+			<ol class="relative flex flex-col gap-10" aria-label="Roadmap">
+				<li class="relative pl-8">
+					<span class="absolute top-1.5 left-0 size-2.75 rounded-xs bg-accent" aria-hidden="true"></span>
+					<p class="font-mono text-mono-s text-accent-soft">April 2026 · Live</p>
+					<p class="mt-1 text-lg font-medium text-fg-1">V2 testnet</p>
+				</li>
+				<li class="relative pl-8">
+					<span class="absolute top-1.5 left-0 size-2.75 rounded-xs border border-fg-3 bg-ink-900" aria-hidden="true"></span>
+					<p class="font-mono text-mono-s text-fg-3">October 2026</p>
+					<p class="mt-1 text-lg font-medium text-fg-1">Mainnet</p>
+				</li>
+			</ol>
+			</div>
+		</div>
+	</div>
+</Section>
+
+<style>
+	.cta {
+		background:
+			radial-gradient(70% 120% at 100% 100%, rgb(47 107 255 / 0.16), transparent 65%),
+			repeating-linear-gradient(122deg, rgb(47 107 255 / 0.05) 0 1px, transparent 1px 34px),
+			var(--color-ink-900);
+	}
+</style>
+
+<script>
+	import { gsap, prefersReducedMotion } from '../../lib/motion';
+
+	// Roadmap line draws from testnet toward mainnet: where we are now (state)
+	const fill = document.querySelector('[data-roadmap] .roadmap-fill');
+	if (fill && !prefersReducedMotion()) {
+		gsap.from(fill, { scaleY: 0, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: fill, start: 'top 85%', once: true } });
+	}
+</script>

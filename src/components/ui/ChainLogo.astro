@@ -1,0 +1,21 @@
+---
+import { Icon } from 'astro-icon/components';
+import { siHedera } from 'simple-icons';
+
+interface Props {
+	icon: string;
+	name: string;
+	class?: string;
+}
+const { icon, name, class: className } = Astro.props;
+---
+
+{
+	icon === 'hedera' ? (
+		<svg viewBox="0 0 24 24" class={className} role="img" aria-label={name} fill="currentColor">
+			<path d={siHedera.path} />
+		</svg>
+	) : (
+		<Icon name={icon} class={className} title={name} />
+	)
+}

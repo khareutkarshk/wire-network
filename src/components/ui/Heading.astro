@@ -1,0 +1,21 @@
+---
+interface Props {
+	as?: 'h1' | 'h2' | 'h3' | 'h4';
+	size?: 'display' | 'h2' | 'h3';
+	id?: string;
+	/** Line-mask reveal on enter (hierarchy motion). */
+	split?: boolean;
+	class?: string;
+}
+const { as: Tag = 'h2', size = 'h2', id, split = false, class: className } = Astro.props;
+
+const sizes = {
+	display: 'text-display',
+	h2: 'text-h2',
+	h3: 'text-h3',
+};
+---
+
+<Tag id={id} data-split={split ? '' : undefined} class:list={['font-medium text-fg-1', sizes[size], className]}>
+	<slot />
+</Tag>

@@ -1,0 +1,71 @@
+---
+import { Icon } from 'astro-icon/components';
+import Section from '../ui/Section.astro';
+import Panel from '../ui/Panel.astro';
+
+const benefits = [
+	'Native-chain asset custody',
+	'Cross-chain ownership coordination',
+	'Less dependence on wrapped assets',
+	'One unified transaction state',
+	'Queryable ownership records',
+];
+---
+
+<Section id="security" labelledby="ownership-title">
+	<div class="grid gap-10 lg:grid-cols-12">
+		<h2 id="ownership-title" class="text-h2 font-medium lg:col-span-7" data-split>
+			<span class="block text-fg-1">The asset stays native.</span>
+			<span class="block text-fg-3">The ownership state becomes portable.</span>
+		</h2>
+		<div class="lg:col-span-4 lg:col-start-9 lg:pt-2">
+			<p class="text-fg-2" data-reveal>
+				Wire never moves assets into a common custody pool. It coordinates cryptographic records of control and ownership across the chains you already use.
+			</p>
+			<ul class="mt-6 flex flex-col gap-2.5 text-sm text-fg-1" data-reveal data-reveal-delay="0.06">
+				{benefits.map((b) => (
+					<li class="flex items-center gap-2.5">
+						<Icon name="ph:check" class="size-3.5 text-accent-soft" aria-hidden="true" />
+						{b}
+					</li>
+				))}
+			</ul>
+		</div>
+	</div>
+
+	<!-- Security by structure: 5 principles, 5 cells -->
+	<div class="mt-16 grid auto-rows-[minmax(11rem,auto)] gap-4 md:grid-cols-6">
+		<Panel surface="tint" class="flex flex-col justify-between gap-10 p-7 md:col-span-3 md:row-span-2 md:p-9" data-reveal>
+			<div class="flex items-center gap-3">
+				<Icon name="ph:shield-check" class="size-7 text-accent-soft" aria-hidden="true" />
+				<p class="text-sm font-medium text-fg-2">Security by structure</p>
+			</div>
+			<p class="text-[clamp(1.5rem,1.1rem+1.4vw,2.25rem)] leading-[1.15] tracking-[-0.025em] text-fg-1">
+				Remove the custody chokepoint instead of adding more security around it.
+			</p>
+		</Panel>
+		<Panel class="flex flex-col justify-end p-6 md:col-span-3" data-reveal data-reveal-delay="0.06">
+			<Icon name="ph:link-break" class="size-6 text-fg-2" aria-hidden="true" />
+			<p class="mt-auto pt-8 text-h3 font-medium text-fg-1">No wrapped tokens. No burn-and-mint issuer.</p>
+		</Panel>
+		<Panel surface="grid" class="flex flex-col justify-end p-6 md:col-span-3" data-reveal data-reveal-delay="0.12">
+			<Icon name="ph:graph" class="size-6 text-fg-2" aria-hidden="true" />
+			<p class="mt-auto pt-8 text-h3 font-medium text-fg-1">No single middleware custody bottleneck</p>
+		</Panel>
+		<Panel class="flex flex-col justify-end p-6 md:col-span-2" data-reveal>
+			<Icon name="ph:fingerprint" class="size-6 text-fg-2" aria-hidden="true" />
+			<p class="mt-auto pt-8 text-lg font-medium text-fg-1">Cryptographic transaction validation</p>
+		</Panel>
+		<Panel class="flex flex-col justify-between gap-8 p-6 md:col-span-4 md:flex-row md:items-end" data-reveal data-reveal-delay="0.06">
+			<div>
+				<Icon name="ph:scales" class="size-6 text-fg-2" aria-hidden="true" />
+				<p class="mt-8 text-lg font-medium text-fg-1">Economically enforced execution</p>
+				<p class="mt-1 text-fg-2">with a defined recovery path when it fails.</p>
+			</div>
+			<div class="flex shrink-0 gap-2">
+				<span class="rounded-control border border-state-settled/30 bg-state-settled/5 px-2.5 py-1 font-mono text-mono-xs uppercase tracking-widest text-state-settled">Settled</span>
+				<span class="rounded-control border border-state-recovering/30 bg-state-recovering/5 px-2.5 py-1 font-mono text-mono-xs uppercase tracking-widest text-state-recovering">Recovered</span>
+			</div>
+		</Panel>
+	</div>
+</Section>

@@ -1,0 +1,284 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/hero/Hero.astro';
+import Convergence from '../components/hero/Convergence';
+import Section from '../components/ui/Section.astro';
+import Heading from '../components/ui/Heading.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+import Button from '../components/ui/Button.astro';
+import TextLink from '../components/ui/TextLink.astro';
+import Panel from '../components/ui/Panel.astro';
+import Metric from '../components/ui/Metric.astro';
+import LifecycleChip from '../components/ui/LifecycleChip.astro';
+import LifecycleDemo from '../components/ui/LifecycleDemo.astro';
+import WireMark from '../components/site/WireMark.astro';
+import { Icon } from 'astro-icon/components';
+import { WHITEPAPER_HREF } from '../lib/site';
+
+// WCAG relative luminance + contrast, computed at build time against ink-950
+const lum = (hex: string) => {
+	const [r, g, b] = [1, 3, 5].map((i) => {
+		const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+		return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+	});
+	return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contrast = (a: string, b: string) => {
+	const [l1, l2] = [lum(a), lum(b)].sort((x, y) => y - x);
+	return (l1 + 0.05) / (l2 + 0.05);
+};
+const BG = '#05070A';
+const grade = (r: number) => (r >= 7 ? 'AAA' : r >= 4.5 ? 'AA' : r >= 3 ? 'AA large' : 'decor');
+
+const surfaces = [
+	{ token: 'ink-950', hex: '#05070A', use: 'Page background' },
+	{ token: 'ink-900', hex: '#0B1016', use: 'Panels, raised bands' },
+	{ token: 'ink-800', hex: '#141B24', use: 'Hover, code blocks' },
+	{ token: 'ink-700', hex: '#1D2631', use: 'Pressed, dividers on panels' },
+];
+const foregrounds = [
+	{ token: 'fg-1', hex: '#E8EDF4', use: 'Headings, primary text' },
+	{ token: 'fg-2', hex: '#A9B3C0', use: 'Body copy' },
+	{ token: 'fg-3', hex: '#6E7885', use: 'Meta, labels, captions' },
+	{ token: 'accent', hex: '#2F6BFF', use: 'The one accent: lines, focus, signal' },
+	{ token: 'accent-soft', hex: '#7EA5FF', use: 'Links and accent text' },
+	{ token: 'state-settled', hex: '#44E2A1', use: 'Lifecycle: settled' },
+	{ token: 'state-recovering', hex: '#E68E35', use: 'Lifecycle: recovering' },
+].map((c) => ({ ...c, ratio: contrast(c.hex, BG) }));
+
+const typeScale = [
+	{ name: 'Display', cls: 'text-display', spec: 'Switzer 500 / clamp 44-72 / 1.02 / -0.035em', sample: 'One financial layer. Every chain.' },
+	{ name: 'H2', cls: 'text-h2', spec: 'Switzer 500 / clamp 32-48 / 1.08 / -0.03em', sample: 'Assets stay where they belong' },
+	{ name: 'H3', cls: 'text-h3', spec: 'Switzer 500 / 24 / 1.25 / -0.015em', sample: 'Deterministic execution' },
+	{ name: 'Body L', cls: 'text-body-l text-fg-2', spec: 'Switzer 400 / 19 / 1.6', sample: 'Wire introduces a shared coordination layer designed to make cross-chain financial state explicit, queryable, and recoverable.' },
+	{ name: 'Body', cls: 'text-body text-fg-2', spec: 'Switzer 400 / 16 / 1.6', sample: 'Transactions follow a defined lifecycle with explicit outcomes. Failed execution follows an explicit recovery path rather than becoming an ambiguous state.' },
+	{ name: 'Mono S', cls: 'font-mono text-mono-s text-fg-2', spec: 'IBM Plex Mono 400 / 13 / 1.4', sample: 'nodeop  kiod  clio  cdt  wire-hub' },
+	{ name: 'Mono XS caps', cls: 'font-mono text-mono-xs uppercase tracking-[0.14em] text-accent-soft', spec: 'IBM Plex Mono 500 / 11 / +0.14em', sample: 'The autonomous AI economy' },
+];
+
+const states = ['pending', 'routing', 'executing', 'settled', 'recovering'] as const;
+---
+
+<Base title="Design system | Wire Network" noindex>
+	<!-- Intro -->
+	<Section class="pt-36 md:pt-40" labelledby="ds-title">
+		<div class="grid gap-10 md:grid-cols-12">
+			<div class="md:col-span-7">
+				<Eyebrow>Internal</Eyebrow>
+				<Heading as="h1" size="display" id="ds-title" class="mt-5">Wire design system</Heading>
+				<p class="mt-6 max-w-prose text-body-l text-fg-2">
+					Serious financial infrastructure, not a crypto startup. Every token below is evolved from the live wire.network palette, with one accent, one theme, and motion that only ever explains something.
+				</p>
+			</div>
+			<dl class="grid grid-cols-3 gap-px self-end overflow-hidden rounded-panel border border-line bg-line md:col-span-5">
+				{
+					[
+						['Variance', '7'],
+						['Motion', '7'],
+						['Density', '5'],
+					].map(([k, v]) => (
+						<div class="bg-ink-950 p-5">
+							<dt class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">{k}</dt>
+							<dd class="mt-3 text-h3 tabular-nums text-fg-1">{v}<span class="text-fg-3">/10</span></dd>
+						</div>
+					))
+				}
+			</dl>
+		</div>
+	</Section>
+
+	<!-- Color -->
+	<Section class="border-t border-line" labelledby="ds-color">
+		<Heading id="ds-color">Color</Heading>
+		<p class="mt-4 max-w-prose text-fg-2">Dark only. Surfaces step up in small increments; separation comes from hairlines, never shadows. Cobalt is the single accent and is never used as a button fill.</p>
+
+		<div class="mt-12 grid gap-4 md:grid-cols-4">
+			{
+				surfaces.map((s) => (
+					<div class="overflow-hidden rounded-panel border border-line">
+						<div class="h-28 border-b border-line" style={`background:${s.hex}`} />
+						<div class="p-4">
+							<p class="font-mono text-mono-s text-fg-1">{s.token}</p>
+							<p class="mt-1 font-mono text-mono-xs text-fg-3">{s.hex}</p>
+							<p class="mt-3 text-sm text-fg-2">{s.use}</p>
+						</div>
+					</div>
+				))
+			}
+		</div>
+
+		<div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			{
+				foregrounds.map((c) => (
+					<div class="flex flex-col justify-between gap-6 rounded-panel border border-line bg-ink-950 p-4">
+						<div class="flex items-start justify-between gap-3">
+							<span class="text-h3 font-medium" style={`color:${c.hex}`}>Aa</span>
+							<span class="rounded-control border border-line px-2 py-1 font-mono text-mono-xs tabular-nums text-fg-2">
+								{c.ratio.toFixed(1)}:1 {grade(c.ratio)}
+							</span>
+						</div>
+						<div>
+							<div class="h-1.5 rounded-full" style={`background:${c.hex}`} />
+							<p class="mt-3 font-mono text-mono-s text-fg-1">{c.token}</p>
+							<p class="mt-1 font-mono text-mono-xs text-fg-3">{c.hex}</p>
+							<p class="mt-2 text-sm text-fg-2">{c.use}</p>
+						</div>
+					</div>
+				))
+			}
+			<div class="flex flex-col justify-between gap-6 rounded-panel border border-line bg-ink-950 p-4">
+				<span class="text-metal text-h2 font-semibold">Wire</span>
+				<div>
+					<p class="font-mono text-mono-s text-fg-1">metal</p>
+					<p class="mt-2 text-sm text-fg-2">Brushed platinum gradient. One use per page: the wordmark.</p>
+				</div>
+			</div>
+		</div>
+	</Section>
+
+	<!-- Type -->
+	<Section class="border-t border-line" labelledby="ds-type">
+		<Heading id="ds-type">Typography</Heading>
+		<p class="mt-4 max-w-prose text-fg-2">Switzer carries the voice: a Swiss grotesk, precise and institutional. IBM Plex Mono carries the machine: states, receipts, metrics, tooling. Emphasis uses weight or color within the same family, never a second display face.</p>
+
+		<div class="mt-12 divide-y divide-line border-y border-line">
+			{
+				typeScale.map((t) => (
+					<div class="grid gap-3 py-8 md:grid-cols-12 md:gap-8">
+						<div class="md:col-span-3">
+							<p class="text-sm font-medium text-fg-1">{t.name}</p>
+							<p class="mt-1 font-mono text-mono-xs text-fg-3">{t.spec}</p>
+						</div>
+						<p class:list={['md:col-span-9 max-w-[62ch] text-balance', t.cls, t.name === 'Display' || t.name === 'H2' || t.name === 'H3' ? 'font-medium text-fg-1' : '']}>{t.sample}</p>
+					</div>
+				))
+			}
+		</div>
+	</Section>
+
+	<!-- Controls -->
+	<Section class="border-t border-line" labelledby="ds-controls">
+		<Heading id="ds-controls">Controls</Heading>
+		<p class="mt-4 max-w-prose text-fg-2">Controls use a 6px radius; panels and media use 14px. One label per intent across the site: Get Early Access, Build on Wire, Explore the Network.</p>
+
+		<div class="mt-12 grid gap-4 lg:grid-cols-2">
+			<Panel class="p-6 md:p-8">
+				<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Buttons</p>
+				<div class="mt-6 flex flex-wrap items-center gap-3">
+					<Button href="#">Get Early Access</Button>
+					<Button href="#" variant="secondary">Explore the Network</Button>
+					<Button href="#" variant="ghost">Build on Wire</Button>
+				</div>
+				<div class="mt-4 flex flex-wrap items-center gap-3">
+					<Button size="sm">Get Early Access</Button>
+					<Button size="sm" variant="secondary" href={WHITEPAPER_HREF} external>Whitepaper</Button>
+					<Button disabled>Disabled</Button>
+				</div>
+				<p class="mt-6 text-sm text-fg-3">Hover, press and tab through to see feedback and focus states.</p>
+			</Panel>
+			<Panel class="p-6 md:p-8">
+				<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Links and icons</p>
+				<div class="mt-6 flex flex-col gap-4">
+					<TextLink href="/developers">Read the developer overview</TextLink>
+					<TextLink href={WHITEPAPER_HREF} external>Read the whitepaper</TextLink>
+				</div>
+				<div class="mt-8 flex flex-wrap gap-5 text-fg-2">
+					{['ph:git-merge', 'ph:shield-check', 'ph:arrows-split', 'ph:cpu', 'ph:fingerprint', 'ph:graph', 'ph:terminal-window', 'ph:cube'].map((n) => <Icon name={n} class="size-6" aria-hidden="true" />)}
+				</div>
+				<p class="mt-4 text-sm text-fg-3">Phosphor, regular weight, one family across the site.</p>
+			</Panel>
+		</div>
+	</Section>
+
+	<!-- Lifecycle -->
+	<Section class="border-t border-line" labelledby="ds-lifecycle">
+		<Heading id="ds-lifecycle">Transaction lifecycle</Heading>
+		<p class="mt-4 max-w-prose text-fg-2">The signature component. State colors exist only here, because here they mean something. In-flight states tick; terminal states are solid.</p>
+
+		<div class="mt-12 flex flex-wrap gap-3">
+			{states.map((s) => <LifecycleChip state={s} />)}
+		</div>
+
+		<div class="mt-8"><LifecycleDemo /></div>
+	</Section>
+
+	<!-- Surfaces -->
+	<Section class="border-t border-line" labelledby="ds-surfaces">
+		<Heading id="ds-surfaces">Panels and metrics</Heading>
+		<p class="mt-4 max-w-prose text-fg-2">Panels only when elevation means hierarchy. Three surfaces give bento grids real variation without leaving the palette.</p>
+
+		<div class="mt-12 grid gap-4 md:grid-cols-6">
+			<Panel class="flex min-h-64 flex-col justify-between p-6 md:col-span-3 md:p-8">
+				<Metric size="xl" value="10,000+" label="Transactions per second, network specification" />
+			</Panel>
+			<Panel surface="tint" class="flex min-h-64 flex-col justify-between p-6 md:col-span-3">
+				<Icon name="ph:shield-check" class="size-7 text-accent-soft" aria-hidden="true" />
+				<div>
+					<p class="text-h3 font-medium text-fg-1">Remove the custody chokepoint</p>
+					<p class="mt-2 text-fg-2">Instead of adding more security around it. Surface: tint.</p>
+				</div>
+			</Panel>
+			<Panel surface="grid" class="flex min-h-48 flex-col justify-end p-6 md:col-span-2">
+				<Metric value="Gas-optional" label="Execution" />
+			</Panel>
+			<Panel class="flex min-h-48 flex-col justify-end p-6 md:col-span-2">
+				<Metric value="Structured" label="Transaction receipts" />
+			</Panel>
+			<Panel class="flex min-h-48 flex-col justify-end p-6 md:col-span-2">
+				<Metric value="300+" label="Connected networks" />
+			</Panel>
+		</div>
+	</Section>
+
+	<!-- Hero visual -->
+	<Section class="border-t border-line" labelledby="ds-visual">
+		<Heading id="ds-visual">Convergence field</Heading>
+		<p class="mt-4 max-w-prose text-fg-2">The hero visual. Three streams (cobalt, slate, horizon) bend into one sheet: chains stay sovereign, state converges. WebGL, paused offscreen, a still frame under reduced motion. Move the pointer across it.</p>
+		<div class="mt-12 aspect-[16/9] overflow-hidden rounded-panel border border-line bg-ink-950">
+			<Convergence client:visible />
+		</div>
+	</Section>
+
+	<!-- Motion -->
+	<Section class="border-t border-line" labelledby="ds-motion">
+		<Heading id="ds-motion">Motion</Heading>
+		<p class="mt-4 max-w-prose text-fg-2">Expo-out easing. 200ms for feedback, 600ms for reveals, 900ms for the hero. Each animation must name what it communicates.</p>
+		<div class="mt-12 grid gap-4 md:grid-cols-2">
+			<Panel class="p-6 md:p-8">
+				<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Hierarchy: line reveal</p>
+				<Heading size="h2" split class="mt-6">The problem isn't messaging. It's ownership.</Heading>
+			</Panel>
+			<Panel class="p-6 md:p-8">
+				<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Sequence: staggered reveal</p>
+				<ul class="mt-6 flex flex-col gap-3 text-fg-1">
+					{['Shared financial state', 'Deterministic execution', 'Native asset security', 'Defined recovery'].map((t, i) => (
+						<li data-reveal data-reveal-delay={i * 0.08} class="flex items-center gap-3">
+							<Icon name="ph:check" class="size-4 text-accent-soft" aria-hidden="true" />
+							{t}
+						</li>
+					))}
+				</ul>
+			</Panel>
+		</div>
+	</Section>
+
+	<!-- Hero composition -->
+	<div class="border-t border-line">
+		<Section class="pb-0 md:pb-0" labelledby="ds-hero">
+			<Heading id="ds-hero">Hero composition</Heading>
+			<p class="mt-4 max-w-prose text-fg-2">Asymmetric split, no eyebrow. A five-word mechanism headline, twenty words of subtext, two CTAs and a live receipt, all inside the first viewport.</p>
+		</Section>
+		<Hero />
+	</div>
+
+	<!-- Mark -->
+	<Section class="border-t border-line" labelledby="ds-mark">
+		<Heading id="ds-mark">Mark</Heading>
+		<div class="mt-12 grid gap-4 md:grid-cols-3">
+			<Panel class="flex h-48 items-center justify-center text-fg-1"><WireMark class="h-12 w-auto" title="Wire mark on ink" /></Panel>
+			<Panel class="flex h-48 items-center justify-center text-ink-950" style="background:#E8EDF4"><WireMark class="h-12 w-auto" title="Wire mark on platinum" /></Panel>
+			<Panel class="flex h-48 items-center justify-center text-fg-1" style="background:#2F6BFF"><WireMark class="h-12 w-auto" title="Wire mark on cobalt" /></Panel>
+		</div>
+		<p class="mt-4 text-sm text-fg-3">Vectorized from the official avatar. Swap in the master SVG when the brand team provides it.</p>
+	</Section>
+</Base>

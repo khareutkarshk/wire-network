@@ -1,0 +1,64 @@
+---
+import '../styles/global.css';
+import Nav from '../components/site/Nav.astro';
+import Footer from '../components/site/Footer.astro';
+import EarlyAccess from '../components/site/EarlyAccess.astro';
+
+interface Props {
+	title?: string;
+	description?: string;
+	noindex?: boolean;
+}
+
+const {
+	title = 'Wire Network | The Financial Control Plane',
+	description = 'Wire coordinates ownership and execution across blockchains through one Universal Transaction Layer. Assets never leave their native chains.',
+	noindex = false,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		{noindex && <meta name="robots" content="noindex, nofollow" />}
+		<meta name="theme-color" content="#05070A" />
+		<meta name="color-scheme" content="dark" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta name="twitter:card" content="summary_large_image" />
+
+		<link rel="preload" href="/fonts/switzer-500.woff2" as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href="/fonts/switzer-400.woff2" as="font" type="font/woff2" crossorigin />
+
+		<!-- Hide reveal targets before first paint, only when motion will run -->
+		<script is:inline>
+			if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion-ok');
+		</script>
+	</head>
+	<body>
+		<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-(--z-sheet) focus:rounded-control focus:bg-fg-1 focus:px-4 focus:py-2 focus:text-ink-950">Skip to content</a>
+		<Nav />
+		<main id="main">
+			<slot />
+		</main>
+		<Footer />
+		<EarlyAccess />
+		<div class="grain" aria-hidden="true"></div>
+
+		<script>
+			import { initMotion } from '../lib/motion';
+			initMotion();
+		</script>
+	</body>
+</html>

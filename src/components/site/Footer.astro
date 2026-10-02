@@ -1,0 +1,45 @@
+---
+import Container from '../ui/Container.astro';
+import TextLink from '../ui/TextLink.astro';
+import WireMark from './WireMark.astro';
+import { NAV, GITHUB_HREF } from '../../lib/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-line pt-16 pb-10">
+	<Container>
+		<div class="grid gap-12 md:grid-cols-12">
+			<div class="md:col-span-6">
+				<a href="/" class="inline-flex items-center gap-3 text-fg-1" aria-label="Wire Network home">
+					<WireMark class="h-6 w-auto" />
+				</a>
+				<p class="mt-5 max-w-[36ch] text-body text-fg-2">
+					The financial control plane for a multi-chain, autonomous economy.
+				</p>
+			</div>
+			<nav aria-label="Footer" class="grid grid-cols-2 gap-8 md:col-span-6 md:grid-cols-3">
+				<div>
+					<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Network</p>
+					<ul class="mt-4 flex flex-col gap-3 text-sm">
+						{NAV.map((item) => <li><TextLink href={item.href} external={item.external}>{item.label}</TextLink></li>)}
+					</ul>
+				</div>
+				<div>
+					<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Build</p>
+					<ul class="mt-4 flex flex-col gap-3 text-sm">
+						<li><TextLink href={GITHUB_HREF} external>GitHub</TextLink></li>
+						<li><TextLink href="/developers">Developer stack</TextLink></li>
+					</ul>
+				</div>
+			</nav>
+		</div>
+		<p class="text-metal mt-20 select-none text-[clamp(4rem,1rem+14vw,13rem)] font-semibold leading-[0.8] tracking-[-0.05em]" aria-hidden="true">
+			Wire Network
+		</p>
+		<div class="mt-10 flex flex-col justify-between gap-3 border-t border-line pt-6 text-sm text-fg-3 md:flex-row">
+			<p>&copy; {year} Wire Network</p>
+			<p>Mainnet launching October 2026</p>
+		</div>
+	</Container>
+</footer>

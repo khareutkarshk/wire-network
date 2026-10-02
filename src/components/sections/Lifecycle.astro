@@ -1,0 +1,60 @@
+---
+import { Icon } from 'astro-icon/components';
+import Section from '../ui/Section.astro';
+import Heading from '../ui/Heading.astro';
+import Panel from '../ui/Panel.astro';
+import LifecycleDemo from '../ui/LifecycleDemo.astro';
+
+const today = [
+	'Assets move between chains',
+	'Bridges add their own custody assumptions',
+	'Every app builds its own recovery system',
+	'Failed transactions are hard to reconcile',
+	'Liquidity fragments across ecosystems',
+];
+const wire = [
+	'Assets remain native to their home chains',
+	'Ownership rights are coordinated through Wire',
+	'Transactions follow a defined lifecycle',
+	'Outcomes are explicit and queryable',
+	'Recovery is part of the execution model',
+];
+---
+
+<Section id="lifecycle" labelledby="lifecycle-title" tone="raised">
+	<div class="max-w-[46rem]">
+		<Heading id="lifecycle-title" split>Every transaction has an answer</Heading>
+		<p class="mt-5 max-w-prose text-body-l text-fg-2">
+			Cross-chain transfers today can end in states nobody can explain. On Wire, a transaction settles or it follows a defined recovery path.
+		</p>
+	</div>
+
+	<div class="mt-14 grid gap-4 md:grid-cols-12">
+		<div class="rounded-panel border border-line p-6 md:col-span-5 md:p-8" data-reveal>
+			<p class="text-sm font-medium text-fg-3">Bridge model</p>
+			<ul class="mt-6 flex flex-col gap-4">
+				{today.map((t) => (
+					<li class="flex gap-3 text-fg-3">
+						<Icon name="ph:x" class="mt-1 size-4 shrink-0" aria-hidden="true" />
+						<span>{t}</span>
+					</li>
+				))}
+			</ul>
+		</div>
+		<Panel surface="tint" class="p-6 md:col-span-7 md:p-8" data-reveal data-reveal-delay="0.08">
+			<p class="text-sm font-medium text-fg-1">Wire model</p>
+			<ul class="mt-6 grid gap-4 sm:grid-cols-2">
+				{wire.map((t) => (
+					<li class="flex gap-3 text-fg-1">
+						<Icon name="ph:check" class="mt-1 size-4 shrink-0 text-accent-soft" aria-hidden="true" />
+						<span>{t}</span>
+					</li>
+				))}
+			</ul>
+		</Panel>
+	</div>
+
+	<div class="mt-4" data-reveal>
+		<LifecycleDemo />
+	</div>
+</Section>

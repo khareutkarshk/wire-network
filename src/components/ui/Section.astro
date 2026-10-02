@@ -1,0 +1,23 @@
+---
+import Container from './Container.astro';
+
+interface Props {
+	id?: string;
+	class?: string;
+	inner?: string;
+	/** tone="raised" lifts the band to ink-900. Same theme family, never an inversion. */
+	tone?: 'base' | 'raised';
+	labelledby?: string;
+}
+const { id, class: className, inner, tone = 'base', labelledby } = Astro.props;
+---
+
+<section
+	id={id}
+	aria-labelledby={labelledby}
+	class:list={['relative py-20 md:py-24', tone === 'raised' && 'bg-ink-900', className]}
+>
+	<Container class={inner}>
+		<slot />
+	</Container>
+</section>

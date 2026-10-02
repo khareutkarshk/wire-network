@@ -1,0 +1,140 @@
+---
+import { Icon } from 'astro-icon/components';
+import Convergence from './Convergence';
+import Button from '../ui/Button.astro';
+import Container from '../ui/Container.astro';
+import LifecycleChip from '../ui/LifecycleChip.astro';
+import ChainLogo from '../ui/ChainLogo.astro';
+import { EARLY_ACCESS_HREF } from '../../lib/site';
+---
+
+<section class="hero relative isolate flex min-h-[100dvh] flex-col justify-center overflow-hidden pt-24 pb-16 md:min-h-[min(100dvh,1000px)]" aria-labelledby="hero-title">
+	<!-- Convergence field: bleeds off the right edge, fades into ink under the copy -->
+	<div class="hero-field absolute inset-y-0 right-0 -z-10 w-full md:w-[70%]" aria-hidden="true">
+		<Convergence client:visible />
+	</div>
+
+	<Container class="relative">
+		<h1 id="hero-title" class="text-[clamp(3rem,1.2rem+6.4vw,7rem)] leading-[0.98] tracking-[-0.045em] font-medium" data-hero-title>
+			<span class="block text-fg-1">Assets stay home.</span>
+			<span class="block text-fg-3">Ownership moves.</span>
+		</h1>
+		<p class="mt-8 max-w-[31rem] text-body-l text-fg-2" data-hero-in>
+			Wire tracks ownership across Ethereum, Solana and 300+ chains. People, apps and AI agents get one answer: settled or recovered.
+		</p>
+		<div class="mt-10 flex flex-wrap items-center gap-3" data-hero-in>
+			<Button href={EARLY_ACCESS_HREF}>Get Early Access</Button>
+			<Button href="/#about" variant="secondary">Explore the Network</Button>
+		</div>
+
+		<!-- Live receipt: a real lifecycle, not a mock dashboard. Desktop only. -->
+		<figure
+			class="hero-receipt panel-edge absolute right-6 bottom-0 hidden w-[19.5rem] rounded-panel border border-line-strong bg-ink-950/75 p-5 backdrop-blur-md lg:block"
+			data-hero-in
+			data-receipt
+		>
+			<figcaption class="sr-only">Example transaction moving from Ethereum to Solana through the Wire lifecycle</figcaption>
+			<div class="flex items-center justify-between">
+				<span class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Transfer</span>
+				<LifecycleChip state="settled" data-receipt-chip />
+			</div>
+			<p class="mt-4 font-mono text-mono-s text-fg-2">0x7a3f…c91e</p>
+			<div class="mt-3 flex items-center gap-2.5 text-sm text-fg-1">
+				<ChainLogo icon="cryptocurrency:eth" name="Ethereum" class="size-4" />
+				<span>Ethereum</span>
+				<Icon name="ph:arrow-right" class="size-3.5 text-fg-3" aria-hidden="true" />
+				<ChainLogo icon="cryptocurrency:sol" name="Solana" class="size-4" />
+				<span>Solana</span>
+			</div>
+			<div class="mt-4 h-px bg-line">
+				<div class="h-px origin-left bg-accent" style="transform: scaleX(1)" data-receipt-bar></div>
+			</div>
+			<dl class="mt-4 grid grid-cols-2 gap-y-1.5 font-mono text-mono-xs">
+				<dt class="text-fg-3">Asset custody</dt>
+				<dd class="text-right text-fg-2">Native chain</dd>
+				<dt class="text-fg-3">Ownership</dt>
+				<dd class="text-right text-fg-2" data-receipt-owner>Recipient</dd>
+			</dl>
+		</figure>
+	</Container>
+</section>
+
+<style>
+	/* Poster: holds the field's tone before WebGL paints (no CLS, no flash) */
+	.hero-field {
+		background:
+			repeating-linear-gradient(122deg, rgb(47 107 255 / 0.10) 0 2px, transparent 2px 46px),
+			var(--color-ink-950);
+		mask-image: linear-gradient(to right, transparent 0%, #000 46%), linear-gradient(to bottom, transparent 0%, #000 16%, #000 76%, transparent 100%);
+		mask-composite: intersect;
+		-webkit-mask-composite: source-in;
+	}
+	@media (max-width: 767px) {
+		.hero-field {
+			opacity: 0.45;
+			mask-image: linear-gradient(to top, transparent 0%, #000 50%);
+		}
+	}
+	@media (prefers-reduced-transparency: reduce) {
+		.hero-receipt { background: var(--color-ink-900); backdrop-filter: none; }
+	}
+	html.motion-ok .hero [data-hero-in] { opacity: 0; }
+	html.motion-ok .hero [data-hero-title] { visibility: hidden; }
+</style>
+
+<script>
+	import { gsap, prefersReducedMotion, EASE, DUR } from '../../lib/motion';
+	import { scramble } from '../../lib/scramble';
+	import { SplitText } from 'gsap/SplitText';
+
+	const reduce = prefersReducedMotion();
+
+	if (!reduce) {
+		document.fonts.ready.then(() => {
+			const title = document.querySelector<HTMLElement>('.hero [data-hero-title]');
+			if (!title) return;
+			const tl = gsap.timeline({ defaults: { ease: EASE } });
+			SplitText.create(title.querySelectorAll('span'), {
+				type: 'lines',
+				mask: 'lines',
+				autoSplit: true,
+				onSplit(self) {
+					gsap.set(title, { visibility: 'visible' });
+					return tl.from(self.lines, { yPercent: 110, duration: DUR.hero, stagger: 0.12 }, 0.1);
+				},
+			});
+			tl.fromTo('.hero [data-hero-in]', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: DUR.hero, stagger: 0.09 }, 0.45);
+		});
+	}
+
+	// Receipt cycles one transaction through the lifecycle. Pauses offscreen; static under reduced motion.
+	const receipt = document.querySelector<HTMLElement>('[data-receipt]');
+	if (receipt && !reduce) {
+		const chip = receipt.querySelector<HTMLElement>('[data-receipt-chip]')!;
+		const label = chip.querySelector<HTMLElement>('.lifecycle-label')!;
+		const bar = receipt.querySelector<HTMLElement>('[data-receipt-bar]')!;
+		const owner = receipt.querySelector<HTMLElement>('[data-receipt-owner]')!;
+		const steps = [
+			{ state: 'pending', progress: 0.08, owner: 'Sender' },
+			{ state: 'routing', progress: 0.38, owner: 'Sender' },
+			{ state: 'executing', progress: 0.7, owner: 'Updating' },
+			{ state: 'settled', progress: 1, owner: 'Recipient' },
+		];
+		const holds = [1100, 1100, 1300, 3200];
+		let i = 0;
+		let timer = 0;
+		const tick = () => {
+			const s = steps[i];
+			chip.dataset.state = s.state;
+			scramble(label, s.state);
+			owner.textContent = s.owner;
+			gsap.to(bar, { scaleX: s.progress, duration: 0.6, ease: EASE });
+			timer = window.setTimeout(tick, holds[i]);
+			i = (i + 1) % steps.length;
+		};
+		new IntersectionObserver(([e]) => {
+			clearTimeout(timer);
+			if (e.isIntersecting) tick();
+		}).observe(receipt);
+	}
+</script>

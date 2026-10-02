@@ -1,0 +1,11 @@
+---
+// Rationed: max 1 eyebrow per 3 sections (3 on the home page). See docs/design-system.md.
+interface Props {
+	class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<p class:list={['font-mono text-mono-xs font-medium uppercase tracking-[0.14em] text-accent-soft', className]}>
+	<slot />
+</p>

@@ -1,0 +1,37 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+	href: string;
+	external?: boolean;
+	class?: string;
+}
+const { href, external = false, class: className } = Astro.props;
+---
+
+<a
+	href={href}
+	target={external ? '_blank' : undefined}
+	rel={external ? 'noopener noreferrer' : undefined}
+	class:list={['text-link group/link inline-flex items-center gap-1 font-medium text-accent-soft', className]}
+>
+	<span class="text-link-label"><slot /></span>
+	<Icon
+		name={external ? 'ph:arrow-up-right' : 'ph:arrow-right'}
+		class="size-[1em] transition-transform duration-(--duration-ui) ease-out-expo group-hover/link:translate-x-0.5"
+		aria-hidden="true"
+	/>
+	{external && <span class="sr-only">(opens in a new tab)</span>}
+</a>
+
+<style>
+	/* Underline draws in from the left on hover (feedback motion) */
+	.text-link-label {
+		background: linear-gradient(currentColor, currentColor) 0 100% / 0% 1px no-repeat;
+		transition: background-size var(--duration-reveal) var(--ease-out-expo);
+	}
+	.text-link:hover .text-link-label,
+	.text-link:focus-visible .text-link-label {
+		background-size: 100% 1px;
+	}
+</style>

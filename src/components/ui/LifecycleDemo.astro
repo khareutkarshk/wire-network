@@ -1,0 +1,141 @@
+---
+import Panel from './Panel.astro';
+
+// A working state machine, not a mock: steps a transaction through the Wire lifecycle.
+const slots = [
+	{ state: 'pending', name: 'Pending', body: 'Transaction initiated' },
+	{ state: 'routing', name: 'Routing', body: 'Optimal execution path determined' },
+	{ state: 'executing', name: 'Executing', body: 'Transaction being processed' },
+	{ state: 'settled', name: 'Settled', body: 'Execution completed as intended' },
+];
+---
+
+<Panel surface="grid" class="p-6 md:p-10" data-lifecycle>
+	<div class="relative">
+	<div class="lc-rail absolute top-1.25 right-0 left-0 hidden h-px bg-line-strong md:block" aria-hidden="true">
+		<div class="lc-fill h-px origin-left bg-accent" style="transform: scaleX(0)"></div>
+	</div>
+	<ol class="lc-track relative grid gap-6 md:grid-cols-4 md:gap-4">
+		{
+			slots.map((s, i) => (
+				<li class="lc-slot relative flex gap-4 md:flex-col md:gap-0" data-slot={i} data-status={i === 0 ? 'active' : 'idle'} data-state={s.state}>
+					<span class="lc-marker relative z-10 mt-1 size-2.75 shrink-0 rounded-xs border md:mt-0" aria-hidden="true" />
+					<div class="md:mt-5">
+						<p class="lc-name font-mono text-mono-s font-medium uppercase tracking-widest">{s.name}</p>
+						<p class="lc-body mt-1.5 text-sm text-fg-2">{s.body}</p>
+					</div>
+				</li>
+			))
+		}
+	</ol>
+	</div>
+
+	<div class="mt-10 grid gap-6 border-t border-line pt-8 md:grid-cols-12 md:gap-10">
+		<div class="flex flex-col justify-between gap-6 md:col-span-4">
+			<p class="text-fg-2">
+				Run it as a success or force a failure. Either way the receipt ends in a defined state that an app or agent can read.
+			</p>
+			<div class="flex flex-wrap gap-2">
+				<button type="button" class="lc-btn" data-lc-run="settled">Run transfer</button>
+				<button type="button" class="lc-btn" data-lc-run="recovering">Simulate failure</button>
+			</div>
+		</div>
+		<pre class="overflow-x-auto rounded-control border border-line bg-ink-950/80 p-5 font-mono text-mono-s leading-relaxed text-fg-2 md:col-span-8" aria-live="polite"><code data-lc-receipt></code></pre>
+	</div>
+</Panel>
+
+<style>
+	.lc-slot {
+		--c: var(--color-fg-3);
+	}
+	.lc-slot[data-status='done'] { --c: var(--color-accent-soft); }
+	.lc-slot[data-status='active'] { --c: var(--color-accent-soft); }
+	.lc-slot[data-status='active'][data-state='settled'] { --c: var(--color-state-settled); }
+	.lc-slot[data-status='active'][data-state='recovering'] { --c: var(--color-state-recovering); }
+
+	.lc-marker {
+		border-color: var(--c);
+		background: var(--color-ink-900);
+		transition: background-color var(--duration-ui) var(--ease-out-expo), border-color var(--duration-ui);
+	}
+	.lc-slot[data-status='done'] .lc-marker,
+	.lc-slot[data-status='active'] .lc-marker {
+		background: var(--c);
+	}
+	.lc-name {
+		color: var(--c);
+		transition: color var(--duration-ui);
+	}
+	.lc-slot[data-status='idle'] .lc-body {
+		color: var(--color-fg-3);
+	}
+	.lc-btn {
+		height: 2.25rem;
+		padding: 0 0.875rem;
+		border-radius: var(--radius-control);
+		border: 1px solid var(--color-line-strong);
+		color: var(--color-fg-1);
+		font-size: 0.875rem;
+		font-weight: 500;
+		transition: background-color var(--duration-ui), border-color var(--duration-ui), transform var(--duration-ui);
+	}
+	.lc-btn:hover { background: var(--color-ink-800); border-color: var(--color-fg-3); }
+	.lc-btn:active { transform: translateY(1px) scale(0.985); }
+	.lc-btn[disabled] { opacity: 0.4; pointer-events: none; }
+</style>
+
+<script>
+	import { gsap, prefersReducedMotion } from '../../lib/motion';
+	import { scramble } from '../../lib/scramble';
+
+	const FINAL = {
+		settled: { name: 'Settled', body: 'Execution completed as intended', extra: { validation: 'passed', ownership: 'reassigned' } },
+		recovering: { name: 'Recovering', body: 'Defined recovery process initiated', extra: { reason: 'target_timeout', recovery: 'defined_path', ownership: 'unchanged' } },
+	} as const;
+
+	document.querySelectorAll<HTMLElement>('[data-lifecycle]').forEach((root) => {
+		const reduce = prefersReducedMotion();
+		const slots = [...root.querySelectorAll<HTMLElement>('[data-slot]')];
+		const fill = root.querySelector<HTMLElement>('.lc-fill')!;
+		const receipt = root.querySelector<HTMLElement>('[data-lc-receipt]')!;
+		const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-lc-run]')];
+		const last = slots[slots.length - 1];
+		let timers: number[] = [];
+
+		const write = (state: string, extra: Record<string, string> = {}) => {
+			receipt.textContent = JSON.stringify({ tx: '0x7a3f…c91e', origin: 'ethereum', target: 'solana', route: 'wire-utl', state, ...extra }, null, 2);
+		};
+
+		const show = (index: number, outcome: keyof typeof FINAL) => {
+			slots.forEach((s, i) => (s.dataset.status = i < index ? 'done' : i === index ? 'active' : 'idle'));
+			const state = index === slots.length - 1 ? outcome : slots[index].dataset.state!;
+			// The outcome is the moment that matters: decode it in
+			if (index === slots.length - 1) scramble(slots[index].querySelector<HTMLElement>('.lc-name')!, FINAL[outcome].name, reduce);
+			gsap.to(fill, { scaleX: index / (slots.length - 1), duration: reduce ? 0 : 0.6, ease: 'expo.out' });
+			write(state, index === slots.length - 1 ? FINAL[outcome].extra : {});
+		};
+
+		const run = (outcome: keyof typeof FINAL) => {
+			timers.forEach(clearTimeout);
+			timers = [];
+			last.dataset.state = outcome;
+			last.querySelector('.lc-name')!.textContent = FINAL[outcome].name;
+			last.querySelector('.lc-body')!.textContent = FINAL[outcome].body;
+			buttons.forEach((b) => (b.disabled = true));
+			slots.forEach((_, i) => {
+				timers.push(window.setTimeout(() => {
+					show(i, outcome);
+					if (i === slots.length - 1) buttons.forEach((b) => (b.disabled = false));
+				}, reduce ? 0 : i * 900));
+			});
+		};
+
+		buttons.forEach((b) => b.addEventListener('click', () => run(b.dataset.lcRun as keyof typeof FINAL)));
+		write('pending');
+		new IntersectionObserver(([e], obs) => {
+			if (!e.isIntersecting) return;
+			run('settled');
+			obs.disconnect();
+		}, { threshold: 0.4 }).observe(root);
+	});
+</script>

@@ -1,0 +1,51 @@
+---
+interface Props {
+	as?: 'div' | 'article' | 'li' | 'figure';
+	/** plain: hairline on ink-900. tint: faint cobalt wash. grid: blueprint pattern. */
+	surface?: 'plain' | 'tint' | 'grid';
+	class?: string;
+	[key: string]: unknown;
+}
+const { as: Tag = 'div', surface = 'plain', class: className, ...rest } = Astro.props;
+---
+
+<Tag
+	class:list={[
+		'panel-edge relative overflow-hidden rounded-panel border border-line bg-ink-900',
+		surface === 'tint' && 'panel-tint',
+		surface === 'grid' && 'panel-grid',
+		className,
+	]}
+	{...rest}
+>
+	<slot />
+</Tag>
+
+<style>
+	.panel-tint {
+		background:
+			radial-gradient(120% 90% at 100% 0%, rgb(47 107 255 / 0.14), transparent 60%),
+			var(--color-ink-900);
+	}
+	/* Blueprint grid: organizes the surface like a schematic, fades out toward the content */
+	.panel-grid {
+		background-color: var(--color-ink-900);
+		background-image:
+			linear-gradient(var(--color-line) 1px, transparent 1px),
+			linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+		background-size: 24px 24px;
+		background-position: -1px -1px;
+		mask-image: none;
+	}
+	.panel-grid::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background: radial-gradient(80% 80% at 30% 100%, var(--color-ink-900) 20%, transparent 80%);
+	}
+	.panel-grid > :global(*) {
+		position: relative;
+		z-index: 1;
+	}
+</style>
