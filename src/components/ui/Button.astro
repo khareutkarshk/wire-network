@@ -7,6 +7,8 @@ interface Props {
 	size?: 'md' | 'sm';
 	external?: boolean;
 	disabled?: boolean;
+	/** Overrides the trailing icon, e.g. ph:download-simple */
+	icon?: string;
 	type?: 'button' | 'submit';
 	class?: string;
 	[key: string]: unknown;
@@ -18,6 +20,7 @@ const {
 	size = 'md',
 	external = false,
 	disabled = false,
+	icon,
 	type = 'button',
 	class: className,
 	...rest
@@ -57,7 +60,9 @@ const Tag = href ? 'a' : 'button';
 >
 	<slot />
 	{
-		external ? (
+		icon ? (
+			<Icon name={icon} class="size-4" aria-hidden="true" />
+		) : external ? (
 			<Icon name="ph:arrow-up-right" class="size-4 transition-transform duration-(--duration-ui) ease-out-expo group-hover/btn:-translate-y-px group-hover/btn:translate-x-px" aria-hidden="true" />
 		) : (
 			variant === 'primary' && (

@@ -30,7 +30,7 @@ The palette evolves the live wire.network tokens (obsidian, platinum, cobalt). T
 | `accent-soft` | `#7EA5FF` | Links and accent text | 8.4:1 |
 | `state-settled` | `#44E2A1` | Lifecycle SETTLED only | 12.1:1 |
 | `state-recovering` | `#E68E35` | Lifecycle RECOVERING only | 8.0:1 |
-| `text-metal` | brushed gradient | One use per page: the wordmark | n/a |
+| `text-metal` | brushed gradient | Reserved for small accents only. Never at display size (too bright on ink) | n/a |
 
 **Rules**
 - Cobalt is the only accent. It is **never a button fill**. The primary button is platinum on ink.
@@ -78,7 +78,7 @@ The palette evolves the live wire.network tokens (obsidian, platinum, cobalt). T
 | `ui/Panel` | Surface `plain`, `tint` or `grid`. Bento grids must mix at least 2 surfaces |
 | `ui/Metric` | `xl` for the hero number, `md` for spec tiles |
 | `ui/LifecycleChip` | `pending`, `routing`, `executing`, `settled`, `recovering`. In-flight states tick |
-| `site/Nav`, `site/Footer` | IA: About (`/#about`), Developers (`/developers`), Whitepaper (external PDF) |
+| `site/Nav`, `site/Footer` | IA: About (`/#about`), Developers (`/developers`), Whitepaper (`/whitepaper` reader). Footer bookends the hero: chains converge into the Wire mark and one SETTLED state comes out (draws once on enter, hover replays a route). No giant wordmark |
 | `site/WireMark` | Official mark, vectorized from the Wire-Network avatar. Swap in the master SVG when available |
 | `hero/Convergence` | WebGL field, ported from Originkit "Stream Convergence" |
 | `hero/Hero` | Asymmetric split, no eyebrow. Mechanism headline, 20-word subtext, live receipt |

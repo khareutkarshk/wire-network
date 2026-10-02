@@ -171,7 +171,7 @@ const states = ['pending', 'routing', 'executing', 'settled', 'recovering'] as c
 				</div>
 				<div class="mt-4 flex flex-wrap items-center gap-3">
 					<Button size="sm">Get Early Access</Button>
-					<Button size="sm" variant="secondary" href={WHITEPAPER_HREF} external>Whitepaper</Button>
+					<Button size="sm" variant="secondary" href={WHITEPAPER_HREF}>Whitepaper</Button>
 					<Button disabled>Disabled</Button>
 				</div>
 				<p class="mt-6 text-sm text-fg-3">Hover, press and tab through to see feedback and focus states.</p>
@@ -180,7 +180,7 @@ const states = ['pending', 'routing', 'executing', 'settled', 'recovering'] as c
 				<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Links and icons</p>
 				<div class="mt-6 flex flex-col gap-4">
 					<TextLink href="/developers">Read the developer overview</TextLink>
-					<TextLink href={WHITEPAPER_HREF} external>Read the whitepaper</TextLink>
+					<TextLink href={WHITEPAPER_HREF}>Read the whitepaper</TextLink>
 				</div>
 				<div class="mt-8 flex flex-wrap gap-5 text-fg-2">
 					{['ph:git-merge', 'ph:shield-check', 'ph:arrows-split', 'ph:cpu', 'ph:fingerprint', 'ph:graph', 'ph:terminal-window', 'ph:cube'].map((n) => <Icon name={n} class="size-6" aria-hidden="true" />)}

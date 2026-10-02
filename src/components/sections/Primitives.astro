@@ -1,127 +1,317 @@
 ---
 import { Icon } from 'astro-icon/components';
 import Container from '../ui/Container.astro';
+import ChainLogo from '../ui/ChainLogo.astro';
+import { CHAINS } from '../../lib/site';
 
+// Copy from data.md. Each card carries a specimen of what the primitive does;
+// WNS terms (bucket contracts, settle.wns) come from the whitepaper, section 7.1.1.
 const primitives = [
-	{
-		mark: 'UPAP',
-		name: 'Universal Polymorphic Address Protocol',
-		body: 'A standard protocol for transaction workflows across different blockchain environments.',
-		note: 'A common transaction language for multi-chain infrastructure.',
-		icon: 'ph:translate',
-		surface: 'tint',
-	},
-	{
-		mark: 'WNS',
-		name: 'Wire Name Service',
-		body: 'A decentralized routing protocol built around UPAP to enable interoperability across connected ecosystems.',
-		note: 'Routing, identity and interoperability in one service.',
-		icon: 'ph:signpost',
-		surface: 'plain',
-	},
-	{
-		mark: 'SSO',
-		name: 'Crypto SSO',
-		body: 'A unified authentication and transaction entry point that cuts the friction of working across many chains.',
-		note: 'One entry point. Multiple chains.',
-		icon: 'ph:key',
-		surface: 'grid',
-	},
-	{
-		mark: 'HW',
-		name: 'Trustless hardware',
-		body: 'A verifiable, auditable hardware stack built around open-source firmware.',
-		note: 'Infrastructure anyone can inspect and verify independently.',
-		icon: 'ph:cpu',
-		surface: 'plain',
-	},
+	{ key: 'upap', mark: 'UPAP', name: 'Universal Polymorphic Address Protocol', body: 'A standard protocol for transaction workflows across different blockchain environments. A common transaction language for multi-chain infrastructure.' },
+	{ key: 'wns', mark: 'WNS', name: 'Wire Name Service', body: 'A decentralized routing protocol built around UPAP. Routing, identity and interoperability in one service.' },
+	{ key: 'sso', mark: 'SSO', name: 'Crypto SSO', body: 'A unified authentication and transaction entry point that cuts the friction of working across many chains.' },
+	{ key: 'hw', mark: 'HW', name: 'Trustless hardware', body: 'A verifiable, auditable hardware stack built around open-source firmware that anyone can inspect.' },
+];
+const dialects = [
+	{ icon: 'cryptocurrency:eth', name: 'Ethereum', form: 'EVM call' },
+	{ icon: 'cryptocurrency:sol', name: 'Solana', form: 'Instruction' },
+	{ icon: 'cryptocurrency:ada', name: 'Cardano', form: 'UTXO' },
+];
+const hops = [
+	{ title: 'Bucket contract', where: 'Ethereum', icon: 'cryptocurrency:eth' },
+	{ title: 'settle.wns', where: 'Wire L1', icon: 'wire' },
+	{ title: 'Bucket contract', where: 'Solana', icon: 'cryptocurrency:sol' },
+];
+const layers = [
+	{ title: 'Node software', note: 'Open source', icon: 'ph:stack' },
+	{ title: 'Firmware', note: 'Open source', icon: 'ph:code' },
+	{ title: 'Hardware', note: 'Verifiable', icon: 'ph:cpu' },
 ];
 ---
 
 <section id="primitives" class="primitives relative overflow-hidden border-t border-line" aria-labelledby="primitives-title">
-	<div class="prim-pin flex min-h-[100dvh] flex-col justify-center gap-12 py-20 lg:py-16">
+	<div class="prim-pin flex min-h-dvh flex-col justify-center gap-12 py-20 lg:py-16">
 		<Container>
 			<div class="flex flex-col justify-between gap-6 md:flex-row md:items-end">
 				<h2 id="primitives-title" class="max-w-[18ch] text-h2 font-medium text-fg-1" data-split>The building blocks of universal transactions</h2>
-				<p class="hidden font-mono text-mono-s text-fg-3 lg:block" aria-hidden="true">
-					<span data-prim-count>1</span> / {primitives.length}
-				</p>
+				<div class="hidden items-center gap-4 lg:flex" aria-hidden="true">
+					<div class="flex gap-1.5">
+						{primitives.map((_, i) => <span class:list={['pip', i === 0 && 'is-on']} data-prim-pip />)}
+					</div>
+					<p class="font-mono text-mono-s text-fg-3"><span class="text-fg-1" data-prim-count>01</span> / 0{primitives.length}</p>
+				</div>
 			</div>
 		</Container>
 
 		<div class="prim-viewport">
 			<ul class="prim-track flex flex-col gap-4 px-4 md:px-6 lg:w-max lg:flex-row lg:gap-5 lg:pr-[10vw] lg:pl-[max(1.5rem,calc((100vw-1320px)/2+1.5rem))]">
-				{primitives.map((p) => (
-					<li class:list={['prim-card panel-edge relative flex flex-col overflow-hidden rounded-panel border border-line p-7 md:p-9 lg:h-[30rem] lg:w-[34rem]', `prim-${p.surface}`]}>
-						<div class="flex items-start justify-between">
-							<span class="font-mono text-[clamp(3.5rem,2.5rem+3vw,5.5rem)] leading-none font-medium tracking-[-0.04em] text-fg-1">{p.mark}</span>
-							<Icon name={p.icon} class="size-7 text-accent-soft" aria-hidden="true" />
-						</div>
-						<div class="mt-auto pt-12">
-							<h3 class="text-h3 font-medium text-fg-1">{p.name}</h3>
-							<p class="mt-3 max-w-[44ch] text-fg-2">{p.body}</p>
-							<p class="mt-6 border-t border-line pt-4 text-sm text-fg-3">{p.note}</p>
-						</div>
-					</li>
-				))}
+				{
+					primitives.map((p, i) => (
+						<li class="prim-card relative flex flex-col overflow-hidden rounded-panel border border-line p-6 md:p-8 lg:h-128 lg:w-136" data-prim={p.key}>
+							<div class="flex items-center justify-between">
+								<span class="mark font-mono text-[2rem] leading-none font-medium tracking-[-0.03em] text-fg-1">{p.mark}</span>
+								<span class="font-mono text-mono-xs text-fg-3">0{i + 1}</span>
+							</div>
+
+							<!-- Specimen -->
+							<div class="specimen relative mt-6 flex h-56 shrink-0 items-center justify-center rounded-control border border-line px-5 py-6" aria-hidden="true">
+								{p.key === 'upap' && (
+									<div class="flex w-full items-center gap-4">
+										<div class="intent shrink-0 rounded-control border border-accent/40 bg-accent/10 px-3 py-2.5 font-mono text-mono-xs">
+											<span class="block text-fg-3">intent</span>
+											<span class="mt-1 block text-fg-1">transfer</span>
+											<span class="block text-accent-soft">1,250 USDC</span>
+										</div>
+										<svg class="fans h-36 min-w-6 flex-1" viewBox="0 0 60 144" preserveAspectRatio="none">
+											<path class="fan" d="M0 72 C 30 72, 30 24, 60 24" />
+											<path class="fan" d="M0 72 H 60" />
+											<path class="fan" d="M0 72 C 30 72, 30 120, 60 120" />
+										</svg>
+										<ul class="flex shrink-0 flex-col gap-3">
+											{dialects.map((d, k) => (
+												<li class="out flex items-center gap-2.5 rounded-control border border-line-strong bg-ink-800 py-1.5 pr-3 pl-1.5" style={`--i:${k}`}>
+													<span class="tile"><ChainLogo icon={d.icon} name={d.name} class="size-3.5" /></span>
+													<span class="font-mono text-mono-xs text-fg-1">{d.form}</span>
+												</li>
+											))}
+										</ul>
+									</div>
+								)}
+
+								{p.key === 'wns' && (
+									<ol class="flex w-full flex-col">
+										{hops.map((h, k) => (
+											<li class="hop relative flex items-center gap-3 py-2" style={`--i:${k}`}>
+												<span class:list={['tile tile-md', h.icon === 'wire' && 'tile-wire']}>
+													{h.icon === 'wire' ? <Icon name="wire" class="h-2.5 w-auto text-accent-soft" /> : <ChainLogo icon={h.icon} name={h.where} class="size-4" />}
+												</span>
+												<span class="min-w-0 flex-1">
+													<span class:list={['block font-mono text-mono-s', h.icon === 'wire' ? 'text-accent-soft' : 'text-fg-1']}>{h.title}</span>
+													<span class="block text-xs text-fg-3">{h.where}</span>
+												</span>
+												<span class="font-mono text-mono-xs text-fg-3">{k === 0 ? 'Asset held' : k === 1 ? 'Ownership updated' : 'Owner resolved'}</span>
+												{k < hops.length - 1 && <span class="hop-line" />}
+											</li>
+										))}
+									</ol>
+								)}
+
+								{p.key === 'sso' && (
+									<div class="flex w-full flex-col items-center gap-6">
+										<div class="sign flex items-center gap-2.5 rounded-control border border-line-strong bg-ink-800 px-4 py-2.5">
+											<Icon name="ph:fingerprint" class="size-4 text-accent-soft" />
+											<span class="text-sm text-fg-1">One sign-in</span>
+										</div>
+										<ul class="grid grid-cols-7 gap-2">
+											{CHAINS.map((c, k) => (
+												<li class="sso-chain relative" style={`--i:${k}`}>
+													<span class="tile tile-md"><ChainLogo icon={c.icon} name={c.name} class="size-4" /></span>
+													<span class="tick"><Icon name="ph:check-bold" class="size-2" /></span>
+												</li>
+											))}
+										</ul>
+										<p class="font-mono text-mono-xs text-fg-3">
+											<span class="sso-count text-fg-1">{CHAINS.length}</span> chains, one session
+										</p>
+									</div>
+								)}
+
+								{p.key === 'hw' && (
+									<div class="flex w-full items-center gap-6">
+										<ul class="flex flex-1 flex-col gap-2">
+											{layers.map((l, k) => (
+												<li class="layer flex items-center gap-3 rounded-control border border-line-strong bg-ink-800 px-3 py-2.5" style={`--i:${k}`}>
+													<Icon name={l.icon} class="size-4 text-fg-2" />
+													<span class="flex-1 text-sm text-fg-1">{l.title}</span>
+													<span class="verified flex items-center gap-1.5 font-mono text-mono-xs text-accent-soft">
+														<Icon name="ph:seal-check" class="size-3.5" />
+														{l.note}
+													</span>
+												</li>
+											))}
+										</ul>
+										<div class="scan hidden flex-col items-center gap-2 sm:flex">
+											<span class="grid size-12 place-items-center rounded-full border border-accent/40 bg-accent/10">
+												<Icon name="ph:magnifying-glass" class="size-5 text-accent-soft" />
+											</span>
+											<span class="font-mono text-mono-xs text-fg-3">Inspect</span>
+										</div>
+									</div>
+								)}
+							</div>
+
+							<h3 class="mt-7 text-h3 font-medium text-fg-1">{p.name}</h3>
+							<p class="mt-2.5 max-w-[48ch] text-fg-2">{p.body}</p>
+						</li>
+					))
+				}
 			</ul>
 		</div>
 	</div>
 </section>
 
 <style>
-	.prim-plain { background: var(--color-ink-900); }
-	.prim-tint {
-		background:
-			radial-gradient(120% 90% at 100% 0%, rgb(47 107 255 / 0.16), transparent 60%),
-			var(--color-ink-900);
+	.prim-card {
+		background: var(--color-ink-900);
+		box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+		transition: border-color var(--duration-reveal) var(--ease-out-expo);
 	}
-	.prim-grid {
-		background-color: var(--color-ink-900);
-		background-image:
-			linear-gradient(var(--color-line) 1px, transparent 1px),
-			linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
-		background-size: 28px 28px;
+	/* The card in focus gets a lit top edge, the same light used across the site */
+	.prim-card::before {
+		content: '';
+		position: absolute;
+		inset: 0 15% auto;
+		height: 1px;
+		background: linear-gradient(90deg, transparent, rgb(126 165 255 / 0.7), transparent);
+		opacity: 0;
+		transition: opacity var(--duration-reveal) var(--ease-out-expo);
 	}
+	.prim-card.is-live {
+		border-color: var(--color-line-strong);
+	}
+	.prim-card.is-live::before {
+		opacity: 1;
+	}
+	.specimen {
+		background-color: var(--color-ink-950);
+		background-image: radial-gradient(var(--color-line) 1px, transparent 1px);
+		background-size: 14px 14px;
+	}
+	.pip {
+		width: 1.5rem;
+		height: 2px;
+		border-radius: 1px;
+		background: var(--color-line-strong);
+		transition: background-color var(--duration-ui);
+	}
+	.pip.is-on {
+		background: var(--color-accent);
+	}
+	.tile {
+		display: inline-flex;
+		width: 1.625rem;
+		height: 1.625rem;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+		border-radius: 5px;
+		border: 1px solid var(--color-line-strong);
+		background: var(--color-ink-700);
+		color: var(--color-fg-1);
+	}
+	.tile-md {
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: var(--radius-control);
+		background: var(--color-ink-800);
+		box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
+	}
+	.tile-wire {
+		border-color: rgb(126 165 255 / 0.45);
+		background: rgb(47 107 255 / 0.12);
+	}
+
+	/* UPAP */
+	.fan {
+		fill: none;
+		stroke: var(--color-accent);
+		stroke-width: 1px;
+		vector-effect: non-scaling-stroke;
+		opacity: 0.75;
+	}
+	/* WNS */
+	.hop-line {
+		position: absolute;
+		left: calc(1.125rem - 0.5px);
+		top: calc(50% + 1.125rem);
+		height: calc(100% - 2.25rem);
+		width: 1px;
+		background: var(--color-accent);
+		opacity: 0.6;
+		transform-origin: top;
+	}
+	/* SSO */
+	.tick {
+		position: absolute;
+		right: -4px;
+		bottom: -4px;
+		display: grid;
+		width: 13px;
+		height: 13px;
+		place-items: center;
+		border-radius: 50%;
+		background: var(--color-state-settled);
+		color: var(--color-ink-950);
+		box-shadow: 0 0 0 2px var(--color-ink-950);
+	}
+
+	/*
+	 * Specimens play once when their card comes into focus. Without JS or with reduced motion
+	 * the final state shows; the start state only applies under html.motion-ok.
+	 */
+	:global(html.motion-ok) .prim-card:not(.is-live) .fans {clip-path: inset(0 100% 0 0);}
+	:global(html.motion-ok) .prim-card:not(.is-live) .out {opacity: 0; transform: translateX(-6px);}
+	:global(html.motion-ok) .prim-card:not(.is-live) .hop {opacity: 0.25;}
+	:global(html.motion-ok) .prim-card:not(.is-live) .hop-line {transform: scaleY(0);}
+	:global(html.motion-ok) .prim-card:not(.is-live) .sign {opacity: 0; transform: translateY(4px);}
+	:global(html.motion-ok) .prim-card:not(.is-live) .sso-chain {opacity: 0.3;}
+	:global(html.motion-ok) .prim-card:not(.is-live) .tick {transform: scale(0);}
+	:global(html.motion-ok) .prim-card:not(.is-live) .layer {opacity: 0.35;}
+	:global(html.motion-ok) .prim-card:not(.is-live) .verified {opacity: 0;}
+	:global(html.motion-ok) .prim-card:not(.is-live) .scan {opacity: 0;}
+	:global(html.motion-ok) .prim-card .fans {transition: clip-path 0.8s var(--ease-out-expo) 0.2s;}
+	:global(html.motion-ok) .prim-card .out {transition: opacity 0.5s var(--ease-out-expo) calc(0.55s + var(--i) * 0.12s), transform 0.5s var(--ease-out-expo) calc(0.55s + var(--i) * 0.12s);}
+	:global(html.motion-ok) .prim-card .hop {transition: opacity 0.5s var(--ease-out-expo) calc(0.15s + var(--i) * 0.45s);}
+	:global(html.motion-ok) .prim-card .hop-line {transition: transform 0.4s var(--ease-out-expo) calc(0.35s + var(--i) * 0.45s);}
+	:global(html.motion-ok) .prim-card .sign {transition: opacity 0.5s var(--ease-out-expo) 0.1s, transform 0.5s var(--ease-out-expo) 0.1s;}
+	:global(html.motion-ok) .prim-card .sso-chain {transition: opacity 0.4s var(--ease-out-expo) calc(0.45s + var(--i) * 0.08s);}
+	:global(html.motion-ok) .prim-card .tick {transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) calc(0.55s + var(--i) * 0.08s);}
+	:global(html.motion-ok) .prim-card .layer {transition: opacity 0.5s var(--ease-out-expo) calc(0.15s + (2 - var(--i)) * 0.3s);}
+	:global(html.motion-ok) .prim-card .verified {transition: opacity 0.5s var(--ease-out-expo) calc(0.35s + (2 - var(--i)) * 0.3s);}
+	:global(html.motion-ok) .prim-card .scan {transition: opacity 0.5s var(--ease-out-expo) 1.2s;}
 </style>
 
 <script>
-	import { gsap, prefersReducedMotion } from '../../lib/motion';
+	import { gsap, ScrollTrigger, prefersReducedMotion } from '../../lib/motion';
 
 	const root = document.querySelector<HTMLElement>('.primitives');
-	if (root && !prefersReducedMotion()) {
-		const mm = gsap.matchMedia();
-		// Desktop: vertical scroll pans the track (horizontal-pan skeleton: pin at top, scrub)
-		mm.add('(min-width: 1024px)', () => {
-			const track = root.querySelector<HTMLElement>('.prim-track')!;
-			const count = root.querySelector<HTMLElement>('[data-prim-count]');
-			const cards = root.querySelectorAll('.prim-card');
-			const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
-			gsap.to(track, {
-				x: () => -distance(),
-				ease: 'none',
-				scrollTrigger: {
-					trigger: root,
-					start: 'top top',
-					end: () => `+=${distance()}`,
-					pin: '.prim-pin',
-					scrub: 0.8,
-					invalidateOnRefresh: true,
-					onUpdate: (self) => {
-						if (count) count.textContent = String(Math.min(cards.length, Math.round(self.progress * (cards.length - 1)) + 1));
+	if (root) {
+		const cards = [...root.querySelectorAll<HTMLElement>('.prim-card')];
+		const pips = [...root.querySelectorAll<HTMLElement>('[data-prim-pip]')];
+		const count = root.querySelector<HTMLElement>('[data-prim-count]');
+		const live = (el: Element) => el.classList.add('is-live');
+		const focus = (i: number) => {
+			pips.forEach((p, k) => p.classList.toggle('is-on', k === i));
+			if (count) count.textContent = `0${i + 1}`;
+			cards.forEach((c, k) => k <= i && live(c));
+		};
+
+		if (prefersReducedMotion()) cards.forEach(live);
+		else {
+			const mm = gsap.matchMedia();
+			// Desktop: vertical scroll pans the track; the card nearest focus plays its specimen
+			mm.add('(min-width: 1024px)', () => {
+				const track = root.querySelector<HTMLElement>('.prim-track')!;
+				const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
+				ScrollTrigger.create({ trigger: root, start: 'top 60%', once: true, onEnter: () => focus(0) });
+				gsap.to(track, {
+					x: () => -distance(),
+					ease: 'none',
+					scrollTrigger: {
+						trigger: root,
+						start: 'top top',
+						end: () => `+=${distance()}`,
+						pin: '.prim-pin',
+						scrub: 0.8,
+						invalidateOnRefresh: true,
+						onUpdate: (self) => focus(Math.min(cards.length - 1, Math.round(self.progress * (cards.length - 1)))),
 					},
-				},
+				});
 			});
-		});
-		mm.add('(max-width: 1023px)', () => {
-			gsap.from(root.querySelectorAll('.prim-card'), {
-				opacity: 0,
-				y: 20,
-				stagger: 0.08,
-				duration: 0.6,
-				ease: 'expo.out',
-				scrollTrigger: { trigger: root, start: 'top 70%', once: true },
+			// Smaller screens: cards stack, each plays as it scrolls in
+			mm.add('(max-width: 1023px)', () => {
+				cards.forEach((c) => ScrollTrigger.create({ trigger: c, start: 'top 75%', once: true, onEnter: () => live(c) }));
 			});
-		});
+		}
 	}
 </script>

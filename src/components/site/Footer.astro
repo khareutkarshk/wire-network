@@ -1,24 +1,105 @@
 ---
 import Container from '../ui/Container.astro';
 import TextLink from '../ui/TextLink.astro';
+import ChainLogo from '../ui/ChainLogo.astro';
+import LifecycleChip from '../ui/LifecycleChip.astro';
 import WireMark from './WireMark.astro';
-import { NAV, GITHUB_HREF } from '../../lib/site';
+import { NAV, GITHUB_HREF, CHAINS } from '../../lib/site';
 
 const year = new Date().getFullYear();
+
+// The footer closes the story the hero opens: every connected chain converges into Wire,
+// and one settled state comes out the other side. Geometry in SVG user units.
+const TILE = 36;
+const NODE = 72;
+const GLOW = 40; // room around the node so its glow isn't clipped
+const n = CHAINS.length;
+const D = (() => {
+	const w = 640, h = 304, nodeX = 400, cy = h / 2;
+	const ys = CHAINS.map((_, i) => TILE / 2 + (i * (h - TILE)) / (n - 1));
+	const paths = ys.map((y) => `M${TILE} ${y} C ${TILE + 190} ${y}, ${nodeX - 170} ${cy}, ${nodeX} ${cy}`);
+	return { w, h, nodeX, ys, paths, out: `M${nodeX + NODE} ${cy} H${w}` };
+})();
+const M = (() => {
+	// Leaves GLOW below the node inside the viewBox
+	const w = 360, h = 240, cx = w / 2;
+	const xs = CHAINS.map((_, i) => ((i + 0.5) * w) / n);
+	const paths = xs.map((x) => `M${x} ${TILE} C ${x} ${TILE + 60}, ${cx} ${h - GLOW / 2 - NODE - 50}, ${cx} ${h - GLOW / 2 - NODE}`);
+	return { w, h, xs, paths };
+})();
 ---
 
-<footer class="border-t border-line pt-16 pb-10">
+<footer class="relative overflow-hidden border-t border-line pt-20 pb-10" data-footer>
+	<div class="edge pointer-events-none absolute inset-x-0 top-0 h-px" aria-hidden="true"></div>
 	<Container>
-		<div class="grid gap-12 md:grid-cols-12">
-			<div class="md:col-span-6">
-				<a href="/" class="inline-flex items-center gap-3 text-fg-1" aria-label="Wire Network home">
-					<WireMark class="h-6 w-auto" />
-				</a>
-				<p class="mt-5 max-w-[36ch] text-body text-fg-2">
-					The financial control plane for a multi-chain, autonomous economy.
+		<!-- Convergence band -->
+		<div class="grid items-center gap-10 lg:grid-cols-12">
+			<figure class="lg:col-span-7" aria-label="Every connected chain converges into one Wire state">
+				<!-- Desktop: left to right. One uniformly scaled SVG so dash lengths stay exact. -->
+				<svg class="hidden w-full md:block" viewBox={`0 0 ${D.w} ${D.h}`} aria-hidden="true">
+					{D.paths.map((d, i) => <path d={d} class="route" pathLength="100" data-route={i} />)}
+					<path d={D.out} class="route route-out" pathLength="100" data-route-out />
+					{D.paths.map((d, i) => <path d={d} class="pkt" pathLength="100" data-pkt={i} />)}
+					<path d={D.out} class="pkt" pathLength="100" data-pkt-out />
+					{
+						CHAINS.map((c, i) => (
+							<foreignObject x="0" y={D.ys[i] - TILE / 2} width={TILE} height={TILE}>
+								<span class="tile" data-chain={i} title={c.name}>
+									<ChainLogo icon={c.icon} name={c.name} class="size-4" />
+								</span>
+							</foreignObject>
+						))
+					}
+					<foreignObject x={D.nodeX - GLOW} y={D.h / 2 - NODE / 2 - GLOW} width={NODE + GLOW * 2} height={NODE + GLOW * 2} class="overflow-visible">
+						<div class="node" data-node><WireMark class="h-4 w-auto" /></div>
+					</foreignObject>
+				</svg>
+
+				<!-- Mobile: top to bottom -->
+				<svg class="w-full md:hidden" viewBox={`0 0 ${M.w} ${M.h}`} aria-hidden="true">
+					{M.paths.map((d, i) => <path d={d} class="route" pathLength="100" data-route={i} />)}
+					{M.paths.map((d, i) => <path d={d} class="pkt" pathLength="100" data-pkt={i} />)}
+					{
+						CHAINS.map((c, i) => (
+							<foreignObject x={M.xs[i] - TILE / 2} y="0" width={TILE} height={TILE}>
+								<span class="tile"><ChainLogo icon={c.icon} name={c.name} class="size-4" /></span>
+							</foreignObject>
+						))
+					}
+					<foreignObject x={M.w / 2 - NODE / 2 - GLOW} y={M.h - GLOW / 2 - NODE - GLOW} width={NODE + GLOW * 2} height={NODE + GLOW * 2} class="overflow-visible">
+						<div class="node" data-node><WireMark class="h-4 w-auto" /></div>
+					</foreignObject>
+				</svg>
+			</figure>
+
+			<div class="lg:col-span-5">
+				<LifecycleChip state="pending" data-footer-chip />
+				<p class="mt-6 text-[clamp(2rem,1.4rem+2vw,3rem)] leading-[1.05] font-medium tracking-[-0.03em] text-fg-1">
+					Many chains.<br /><span class="text-fg-3">One financial state.</span>
 				</p>
+				<ul class="mt-8 flex flex-col gap-3 text-sm">
+					<li class="flex items-center gap-2.5 text-fg-1">
+						<span class="dot" aria-hidden="true"></span>
+						V2 Testnet live
+					</li>
+					<li class="flex items-center gap-2.5 text-fg-2">
+						<span class="dot dot-pending" aria-hidden="true"></span>
+						Mainnet, October 2026
+					</li>
+				</ul>
 			</div>
-			<nav aria-label="Footer" class="grid grid-cols-2 gap-8 md:col-span-6 md:grid-cols-3">
+		</div>
+
+		<!-- Links -->
+		<div class="mt-20 grid gap-10 border-t border-line pt-10 md:grid-cols-12">
+			<div class="md:col-span-5">
+				<a href="/" class="inline-flex items-center gap-3 text-fg-1" aria-label="Wire Network home">
+					<WireMark class="h-5 w-auto" />
+					<span class="font-medium tracking-[-0.01em]">Wire Network</span>
+				</a>
+				<p class="mt-4 max-w-[34ch] text-sm text-fg-2">The financial control plane for a multi-chain, autonomous economy.</p>
+			</div>
+			<nav aria-label="Footer" class="grid grid-cols-2 gap-8 md:col-span-7 md:grid-cols-3">
 				<div>
 					<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Network</p>
 					<ul class="mt-4 flex flex-col gap-3 text-sm">
@@ -28,18 +109,166 @@ const year = new Date().getFullYear();
 				<div>
 					<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Build</p>
 					<ul class="mt-4 flex flex-col gap-3 text-sm">
-						<li><TextLink href={GITHUB_HREF} external>GitHub</TextLink></li>
 						<li><TextLink href="/developers">Developer stack</TextLink></li>
+						<li><TextLink href="https://github.com/Wire-Network/wire-sysio" external>wire-sysio</TextLink></li>
+						<li><TextLink href={GITHUB_HREF} external>GitHub</TextLink></li>
 					</ul>
 				</div>
 			</nav>
 		</div>
-		<p class="text-metal mt-20 select-none text-[clamp(4rem,1rem+14vw,13rem)] font-semibold leading-[0.8] tracking-[-0.05em]" aria-hidden="true">
-			Wire Network
-		</p>
-		<div class="mt-10 flex flex-col justify-between gap-3 border-t border-line pt-6 text-sm text-fg-3 md:flex-row">
+
+		<div class="mt-12 flex flex-col justify-between gap-3 text-sm text-fg-3 md:flex-row">
 			<p>&copy; {year} Wire Network</p>
-			<p>Mainnet launching October 2026</p>
+			<p class="font-mono text-mono-xs uppercase tracking-[0.12em]">Assets stay home. Ownership moves.</p>
 		</div>
 	</Container>
 </footer>
+
+<style>
+	.edge {
+		background: linear-gradient(90deg, transparent, rgb(126 165 255 / 0.35), transparent);
+	}
+	.tile {
+		display: flex;
+		width: 100%;
+		height: 100%;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--radius-control);
+		border: 1px solid var(--color-line-strong);
+		background: var(--color-ink-800);
+		color: var(--color-fg-2);
+		box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
+		transition: color var(--duration-ui), border-color var(--duration-ui);
+	}
+	.tile[data-chain] {
+		cursor: default;
+	}
+	.tile.is-hot {
+		color: var(--color-fg-1);
+		border-color: var(--color-accent);
+	}
+	.route {
+		fill: none;
+		stroke: var(--color-line-strong);
+		stroke-width: 1px;
+		transition: stroke var(--duration-ui);
+	}
+	.route.is-hot,
+	.route-out {
+		stroke: rgb(47 107 255 / 0.55);
+	}
+	/* A short bright segment that travels the route once */
+	.pkt {
+		fill: none;
+		stroke: var(--color-accent-soft);
+		stroke-width: 2px;
+		stroke-linecap: round;
+		stroke-dasharray: 6 200;
+		stroke-dashoffset: 6;
+	}
+	/* Routes start undrawn only when JS will draw them */
+	:global(html.motion-ok) .route {
+		stroke-dasharray: 100 200;
+		stroke-dashoffset: 100;
+	}
+	.node {
+		display: grid;
+		width: calc(100% - 80px);
+		height: calc(100% - 80px);
+		margin: 40px;
+		place-items: center;
+		border-radius: var(--radius-panel);
+		border: 1px solid var(--color-line-strong);
+		background: linear-gradient(180deg, var(--color-ink-800), var(--color-ink-900));
+		color: var(--color-fg-1);
+		box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+		transition: box-shadow var(--duration-reveal) var(--ease-out-expo), border-color var(--duration-reveal) var(--ease-out-expo);
+	}
+	.node.is-lit {
+		border-color: rgb(126 165 255 / 0.5);
+		box-shadow:
+			inset 0 1px 0 rgb(255 255 255 / 0.08),
+			0 0 0 6px rgb(47 107 255 / 0.08),
+			0 0 48px rgb(47 107 255 / 0.3);
+	}
+	.dot {
+		width: 6px;
+		height: 6px;
+		flex-shrink: 0;
+		border-radius: 50%;
+		background: var(--color-state-settled);
+		box-shadow: 0 0 0 3px rgb(68 226 161 / 0.15);
+	}
+	.dot-pending {
+		background: transparent;
+		border: 1px solid var(--color-fg-3);
+		box-shadow: none;
+	}
+</style>
+
+<script>
+	import { gsap, ScrollTrigger, prefersReducedMotion } from '../../lib/motion';
+
+	const root = document.querySelector<HTMLElement>('[data-footer]');
+	if (root) {
+		const chip = root.querySelector<HTMLElement>('[data-footer-chip]')!;
+		const setChip = (s: string) => {
+			chip.dataset.state = s;
+			chip.querySelector('.lifecycle-label')!.textContent = s;
+		};
+		// Only the visible layout (desktop or mobile) animates
+		const layout = () => [...root.querySelectorAll<SVGSVGElement>('figure > svg')].find((el) => el.getBoundingClientRect().width > 0)!;
+		const travel = (el: Element, dur = 0.9) => gsap.fromTo(el, { strokeDashoffset: 6 }, { strokeDashoffset: -100, duration: dur, ease: 'power2.inOut' });
+
+		if (prefersReducedMotion()) {
+			setChip('settled');
+			root.querySelectorAll('[data-node]').forEach((n) => n.classList.add('is-lit'));
+		} else {
+			ScrollTrigger.create({
+				trigger: root,
+				start: 'top 75%',
+				once: true,
+				onEnter: () => {
+					const l = layout();
+					const routes = l.querySelectorAll('[data-route]');
+					const pkts = l.querySelectorAll('[data-pkt]');
+					const out = l.querySelector('[data-pkt-out]');
+					const node = l.querySelector('[data-node]')!;
+					const tl = gsap.timeline();
+					tl.to([...routes, l.querySelector('[data-route-out]')].filter(Boolean), { strokeDashoffset: 0, duration: 1.1, ease: 'expo.out', stagger: 0.06 })
+						.add(() => setChip('routing'), 0.3)
+						.add(() => pkts.forEach((p, i) => gsap.delayedCall(i * 0.08, () => travel(p))), 0.6)
+						.add(() => {
+							node.classList.add('is-lit');
+							setChip('executing');
+						}, 1.9)
+						.add(() => {
+							if (out) travel(out, 0.8);
+						}, 2.1)
+						.add(() => setChip('settled'), 2.8);
+				},
+			});
+
+			// Hover a chain: light its route and send one packet through
+			const tiles = root.querySelectorAll<HTMLElement>('[data-chain]');
+			tiles.forEach((t) => {
+				const i = t.dataset.chain!;
+				const desk = t.closest('svg')!;
+				const route = desk.querySelector(`[data-route="${i}"]`)!;
+				const pkt = desk.querySelector(`[data-pkt="${i}"]`)!;
+				const on = () => {
+					t.classList.add('is-hot');
+					route.classList.add('is-hot');
+					travel(pkt, 0.7);
+				};
+				const off = () => {
+					t.classList.remove('is-hot');
+					route.classList.remove('is-hot');
+				};
+				t.addEventListener('pointerenter', on);
+				t.addEventListener('pointerleave', off);
+			});
+		}
+	}
+</script>

@@ -6,7 +6,8 @@ import TextLink from '../ui/TextLink.astro';
 import { STACK } from '../../lib/stack';
 import { GITHUB_HREF } from '../../lib/site';
 
-const capabilities = ['Smart contracts', 'WASM execution', 'APIs', 'SDKs', 'CLI tooling', 'Block explorer'];
+const capabilities = ['Smart contracts', 'WASM', 'APIs', 'SDKs', 'CLI', 'Explorer'];
+const kinds: Record<string, string> = { nodeop: 'daemon', kiod: 'wallet', clio: 'cli', CDT: 'toolchain', 'Wire Hub': 'web' };
 ---
 
 <Section id="developers" labelledby="dev-title" tone="raised">
@@ -16,25 +17,100 @@ const capabilities = ['Smart contracts', 'WASM execution', 'APIs', 'SDKs', 'CLI 
 			<p class="mt-5 max-w-[40ch] text-fg-2" data-reveal>
 				Coordinate assets, ownership and execution across chains from one toolchain, built on the AntelopeIO lineage.
 			</p>
-			<ul class="mt-8 flex flex-wrap gap-2" data-reveal data-reveal-delay="0.06">
-				{capabilities.map((c) => <li class="rounded-control border border-line-strong px-2.5 py-1 text-sm text-fg-2">{c}</li>)}
-			</ul>
+			<p class="mt-6 font-mono text-mono-xs uppercase tracking-widest text-fg-3" data-reveal data-reveal-delay="0.06">
+				{capabilities.map((c, i) => <>{i > 0 && <span class="mx-1.5 text-line-strong">/</span>}{c}</>)}
+			</p>
 			<div class="mt-10 flex flex-wrap items-center gap-5" data-reveal data-reveal-delay="0.12">
 				<Button href="/developers" variant="secondary">Build on Wire</Button>
 				<TextLink href={GITHUB_HREF} external>GitHub</TextLink>
 			</div>
 		</div>
 
-		<ul class="border-t border-line-strong lg:col-span-7 lg:col-start-6">
-			{STACK.map((s) => (
-				<li class="border-b border-line">
-					<a href="/developers#stack" class="stack-row group grid grid-cols-[7.5rem_1fr_auto] items-center gap-4 py-5 md:grid-cols-[10rem_1fr_auto] md:py-6">
-						<span class="font-mono text-body-l text-fg-1">{s.name}</span>
-						<span class="text-fg-2 transition-colors duration-(--duration-ui) group-hover:text-fg-1">{s.role}</span>
-						<Icon name="ph:arrow-right" class="size-4 -translate-x-1 text-fg-3 opacity-0 transition-[opacity,transform] duration-(--duration-ui) ease-out-expo group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:opacity-100" aria-hidden="true" />
-					</a>
-				</li>
-			))}
+		<ul class="stack border-t border-line-strong lg:col-span-7 lg:col-start-6" data-stack>
+			{
+				STACK.map((s, i) => (
+					<li class="border-b border-line">
+						<a href="/developers#stack" class="row group relative grid grid-cols-[2rem_1fr_auto] items-start gap-x-4 py-5 md:grid-cols-[2.5rem_9rem_1fr_auto] md:py-6" data-active={i === 0 ? 'true' : undefined}>
+							<span class="marker" aria-hidden="true" />
+							<span class="pt-1 font-mono text-mono-xs text-fg-3">0{i + 1}</span>
+							<span class="name font-mono text-body-l text-fg-2">{s.name}</span>
+							<span class="col-start-2 mt-1 min-w-0 md:col-start-auto md:mt-0">
+								<span class="role block text-fg-2">{s.role}</span>
+								<span class="detail grid">
+									<span class="overflow-hidden">
+										<span class="block pt-1.5 text-sm text-fg-3">{s.detail}</span>
+									</span>
+								</span>
+							</span>
+							<span class="col-start-3 row-start-1 flex items-center gap-3 pt-1 md:col-start-auto md:row-start-auto">
+								<span class="hidden font-mono text-mono-xs text-fg-3 sm:inline">{kinds[s.name]}</span>
+								<Icon name="ph:arrow-right" class="arrow size-4 text-fg-3" aria-hidden="true" />
+							</span>
+						</a>
+					</li>
+				))
+			}
 		</ul>
 	</div>
 </Section>
+
+<style>
+	.row {
+		transition: background-color var(--duration-ui);
+	}
+	.marker {
+		position: absolute;
+		left: 0;
+		top: 1.25rem;
+		bottom: 1.25rem;
+		width: 2px;
+		border-radius: 1px;
+		background: var(--color-accent);
+		transform: scaleY(0);
+		transition: transform var(--duration-reveal) var(--ease-out-expo);
+	}
+	.row > span:nth-child(2) {
+		padding-left: 0.75rem;
+	}
+	.name,
+	.role {
+		transition: color var(--duration-ui);
+	}
+	.detail {
+		grid-template-rows: 0fr;
+		opacity: 0;
+		transition: grid-template-rows var(--duration-reveal) var(--ease-out-expo), opacity var(--duration-reveal) var(--ease-out-expo);
+	}
+	.arrow {
+		opacity: 0;
+		transform: translateX(-4px);
+		transition: opacity var(--duration-ui), transform var(--duration-ui) var(--ease-out-expo);
+	}
+	.row[data-active] .marker {
+		transform: scaleY(1);
+	}
+	.row[data-active] .name,
+	.row[data-active] .role {
+		color: var(--color-fg-1);
+	}
+	.row[data-active] .detail {
+		grid-template-rows: 1fr;
+		opacity: 1;
+	}
+	.row[data-active] .arrow {
+		opacity: 1;
+		transform: none;
+	}
+</style>
+
+<script>
+	// One row open at a time: follows hover and keyboard focus, stays on the last one touched
+	document.querySelectorAll<HTMLElement>('[data-stack]').forEach((list) => {
+		const rows = [...list.querySelectorAll<HTMLElement>('.row')];
+		const open = (r: HTMLElement) => rows.forEach((x) => x.toggleAttribute('data-active', x === r));
+		rows.forEach((r) => {
+			r.addEventListener('pointerenter', () => open(r));
+			r.addEventListener('focus', () => open(r));
+		});
+	});
+</script>

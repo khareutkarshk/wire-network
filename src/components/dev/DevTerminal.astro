@@ -1,0 +1,298 @@
+---
+import { Icon } from 'astro-icon/components';
+
+// Every command and output below is taken from the wire-sysio and wire-cdt READMEs.
+// `copy` holds the full command set; the display abridges long cmake flags.
+type Line = { k: 'cmd' | 'out' | 'note'; t: string };
+const tabs: { id: string; label: string; path: string; lines: Line[]; copy: string }[] = [
+	{
+		id: 'build',
+		label: 'Build',
+		path: '~/wire-sysio',
+		lines: [
+			{ k: 'note', t: '# macOS Apple Silicon developer build' },
+			{ k: 'cmd', t: 'git submodule update --init --recursive vcpkg libraries/appbase' },
+			{ k: 'cmd', t: './vcpkg/bootstrap-vcpkg.sh' },
+			{ k: 'cmd', t: 'cmake -B build/macos-arm64 -S . -G Ninja \\' },
+			{ k: 'out', t: '    -DVCPKG_TARGET_TRIPLET=arm64-osx ...' },
+			{ k: 'cmd', t: 'cmake --build build/macos-arm64 --target nodeop clio kiod' },
+		],
+		copy: [
+			'git submodule update --init --recursive vcpkg libraries/appbase',
+			'./vcpkg/bootstrap-vcpkg.sh',
+			'cmake -B build/macos-arm64 -S . -G Ninja \\',
+			'  -DCMAKE_BUILD_TYPE=Debug \\',
+			'  -DVCPKG_TARGET_TRIPLET=arm64-osx \\',
+			'  -DBUILD_SYSTEM_CONTRACTS=OFF \\',
+			'  -DBUILD_TEST_CONTRACTS=OFF \\',
+			'  -DENABLE_CCACHE=ON \\',
+			'  -DENABLE_TESTS=ON \\',
+			'  -DENABLE_JEMALLOC=OFF \\',
+			'  -DDISABLE_WASM_SPEC_TESTS=OFF \\',
+			'  -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake',
+			'cmake --build build/macos-arm64 --target fc nodeop clio kiod sys-util unit_test plugin_test test_fc -- -j"$(sysctl -n hw.logicalcpu)"',
+		].join('\n'),
+	},
+	{
+		id: 'verify',
+		label: 'Verify',
+		path: '~',
+		lines: [
+			{ k: 'cmd', t: 'nodeop --full-version' },
+			{ k: 'out', t: 'v3.1.2-0b64f879e3ebe2e4df09d2e62f1fc164cc1125d1' },
+			{ k: 'cmd', t: 'cdt-cpp --version' },
+			{ k: 'out', t: 'Wire CDT version 4.x.x' },
+		],
+		copy: 'nodeop --full-version\ncdt-cpp --version',
+	},
+	{
+		id: 'test',
+		label: 'Test',
+		path: '~/wire-sysio/build',
+		lines: [
+			{ k: 'note', t: '# parallelizable unit tests, recommended after every build' },
+			{ k: 'cmd', t: 'ctest -j "$(nproc)" -LE _tests' },
+			{ k: 'note', t: '# WASM runtime conformance against the spec' },
+			{ k: 'cmd', t: 'ctest -j "$(nproc)" -L wasm_spec_tests' },
+		],
+		copy: 'ctest -j "$(nproc)" -LE _tests\nctest -j "$(nproc)" -L wasm_spec_tests',
+	},
+];
+---
+
+<div class="term relative overflow-hidden rounded-panel border border-line-strong" data-term>
+	<!-- Header: tabs + path + copy -->
+	<div class="flex items-center justify-between gap-3 border-b border-line bg-ink-900/80 px-2 py-2">
+		<div class="flex gap-1" role="tablist" aria-label="Wire Sysio commands">
+			{
+				tabs.map((t, i) => (
+					<button
+						type="button"
+						role="tab"
+						id={`term-tab-${t.id}`}
+						aria-controls={`term-panel-${t.id}`}
+						aria-selected={i === 0 ? 'true' : 'false'}
+						tabindex={i === 0 ? 0 : -1}
+						class="term-tab rounded-control px-3 py-1.5 font-mono text-mono-s"
+						data-term-tab={t.id}
+					>
+						{t.label}
+					</button>
+				))
+			}
+		</div>
+		<button type="button" class="copy inline-flex items-center gap-1.5 rounded-control px-2.5 py-1.5 font-mono text-mono-xs text-fg-3" data-term-copy>
+			<Icon name="ph:copy" class="size-3.5" data-icon-copy aria-hidden="true" />
+			<Icon name="ph:check" class="hidden size-3.5 text-state-settled" data-icon-done aria-hidden="true" />
+			<span data-copy-label>Copy</span>
+		</button>
+	</div>
+
+	<!-- Panels -->
+	<div class="relative h-[15rem] bg-ink-950/90 sm:h-[14.25rem]">
+		{
+			tabs.map((t, i) => (
+				<div
+					role="tabpanel"
+					id={`term-panel-${t.id}`}
+					aria-labelledby={`term-tab-${t.id}`}
+					class="absolute inset-0 overflow-x-auto p-5"
+					hidden={i !== 0}
+					data-term-panel={t.id}
+					data-copy={t.copy}
+				>
+					<p class="mb-3 flex items-center gap-2 font-mono text-mono-xs text-fg-3">
+						<Icon name="ph:folder-simple" class="size-3.5" aria-hidden="true" />
+						{t.path}
+					</p>
+					<pre class="font-mono text-mono-s leading-[1.85]"><code>{t.lines.map((l) => (
+						<span class:list={['ln block', `ln-${l.k}`]} data-ln={l.k}>{l.k === 'cmd' && <span class="text-fg-3 select-none">$ </span>}<span data-t>{l.t}</span></span>
+					))}</code></pre>
+				</div>
+			))
+		}
+	</div>
+
+	<!-- Status bar: supported targets from the README -->
+	<div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-line bg-ink-900/80 px-4 py-2.5 font-mono text-mono-xs text-fg-3">
+		<span class="flex items-center gap-2">
+			<span class="dot" aria-hidden="true"></span>
+			wire-sysio v3.1.2
+		</span>
+		<span class="flex items-center gap-3">
+			<span class="flex items-center gap-1.5"><Icon name="ph:linux-logo" class="size-3.5" aria-hidden="true" />Ubuntu 24.04, 25.04</span>
+			<span class="flex items-center gap-1.5"><Icon name="ph:apple-logo" class="size-3.5" aria-hidden="true" />macOS arm64</span>
+		</span>
+	</div>
+	<p class="sr-only" aria-live="polite" data-term-live></p>
+</div>
+
+<style>
+	.term {
+		background: var(--color-ink-950);
+		box-shadow:
+			inset 0 1px 0 rgb(255 255 255 / 0.05),
+			0 40px 80px -40px rgb(47 107 255 / 0.35);
+	}
+	/* Lit top edge, same language as the hero receipt */
+	.term::before {
+		content: '';
+		position: absolute;
+		inset: 0 12% auto;
+		height: 1px;
+		background: linear-gradient(90deg, transparent, rgb(126 165 255 / 0.7), transparent);
+		z-index: 1;
+	}
+	.term-tab {
+		color: var(--color-fg-3);
+		transition: color var(--duration-ui), background-color var(--duration-ui);
+	}
+	.term-tab:hover {
+		color: var(--color-fg-1);
+	}
+	.term-tab[aria-selected='true'] {
+		color: var(--color-fg-1);
+		background: var(--color-ink-700);
+		box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+	}
+	.copy {
+		transition: color var(--duration-ui), background-color var(--duration-ui);
+	}
+	.copy:hover {
+		color: var(--color-fg-1);
+		background: var(--color-ink-800);
+	}
+	.ln-cmd {
+		color: var(--color-fg-1);
+	}
+	.ln-out {
+		color: var(--color-fg-2);
+	}
+	.ln-note {
+		color: var(--color-fg-3);
+	}
+	.dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--color-state-settled);
+		box-shadow: 0 0 0 3px rgb(68 226 161 / 0.15);
+	}
+	/* Typing state, only applied when motion is allowed */
+	:global(.ln.is-pending) {
+		visibility: hidden;
+	}
+	:global(.caret) {
+		display: inline-block;
+		width: 0.55em;
+		height: 1.1em;
+		margin-left: 1px;
+		vertical-align: -0.2em;
+		background: var(--color-accent-soft);
+	}
+</style>
+
+<script>
+	import { prefersReducedMotion } from '../../lib/motion';
+
+	document.querySelectorAll<HTMLElement>('[data-term]').forEach((root) => {
+		const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-term-tab]')];
+		const panels = [...root.querySelectorAll<HTMLElement>('[data-term-panel]')];
+		const live = root.querySelector<HTMLElement>('[data-term-live]')!;
+		const reduce = prefersReducedMotion();
+		let run = 0; // cancels an in-flight typing run when the tab changes
+
+		// Store the full text so typing can rebuild it
+		panels.forEach((p) => p.querySelectorAll<HTMLElement>('[data-t]').forEach((t) => (t.dataset.full = t.textContent ?? '')));
+
+		const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+		const caret = document.createElement('span');
+		caret.className = 'caret';
+		caret.setAttribute('aria-hidden', 'true');
+
+		async function type(panel: HTMLElement) {
+			const id = ++run;
+			const lines = [...panel.querySelectorAll<HTMLElement>('.ln')];
+			if (reduce) {
+				lines.forEach((l) => l.classList.remove('is-pending'));
+				return;
+			}
+			lines.forEach((l) => {
+				l.classList.add('is-pending');
+				const t = l.querySelector<HTMLElement>('[data-t]')!;
+				t.textContent = t.dataset.full ?? '';
+			});
+			for (const l of lines) {
+				if (id !== run) return;
+				const t = l.querySelector<HTMLElement>('[data-t]')!;
+				const full = t.dataset.full ?? '';
+				l.classList.remove('is-pending');
+				if (l.dataset.ln === 'cmd') {
+					t.textContent = '';
+					t.after(caret);
+					for (let c = 1; c <= full.length; c += 2) {
+						if (id !== run) return;
+						t.textContent = full.slice(0, c);
+						await sleep(14);
+					}
+					t.textContent = full;
+					await sleep(220);
+				} else {
+					await sleep(90);
+				}
+			}
+			if (id === run) lines.at(-1)?.querySelector('[data-t]')?.after(caret);
+		}
+
+		function select(i: number, focus = false) {
+			tabs.forEach((t, n) => {
+				t.setAttribute('aria-selected', String(n === i));
+				t.tabIndex = n === i ? 0 : -1;
+				panels[n].hidden = n !== i;
+			});
+			if (focus) tabs[i].focus();
+			type(panels[i]);
+		}
+
+		tabs.forEach((t, i) => {
+			t.addEventListener('click', () => select(i));
+			t.addEventListener('keydown', (e) => {
+				const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+				if (d) {
+					e.preventDefault();
+					select((i + d + tabs.length) % tabs.length, true);
+				}
+			});
+		});
+
+		// Copy the full, unabridged commands of the visible tab
+		const copyBtn = root.querySelector<HTMLButtonElement>('[data-term-copy]')!;
+		const label = copyBtn.querySelector<HTMLElement>('[data-copy-label]')!;
+		const iconCopy = copyBtn.querySelector('[data-icon-copy]')!;
+		const iconDone = copyBtn.querySelector('[data-icon-done]')!;
+		let timer: number | undefined;
+		copyBtn.addEventListener('click', async () => {
+			const panel = panels.find((p) => !p.hidden)!;
+			try {
+				await navigator.clipboard.writeText(panel.dataset.copy ?? '');
+			} catch {
+				return;
+			}
+			label.textContent = 'Copied';
+			iconCopy.classList.add('hidden');
+			iconDone.classList.remove('hidden');
+			live.textContent = 'Commands copied to clipboard';
+			clearTimeout(timer);
+			timer = window.setTimeout(() => {
+				label.textContent = 'Copy';
+				iconCopy.classList.remove('hidden');
+				iconDone.classList.add('hidden');
+			}, 1600);
+		});
+
+		// First run starts once the hero entrance has settled
+		const first = panels[0];
+		if (!reduce) first.querySelectorAll('.ln').forEach((l) => l.classList.add('is-pending'));
+		setTimeout(() => type(first), reduce ? 0 : 900);
+	});
+</script>

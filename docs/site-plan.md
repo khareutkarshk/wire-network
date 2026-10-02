@@ -38,9 +38,9 @@ The old copy failed in four ways:
 | 3 | `#about` Problem | Editorial statement + offset 4-column principles | Core value prop + 4 key points | Paragraph lights up word by word on scroll (reading pace) |
 | 4 | UTL ✱ | Pinned scroll-telling: sticky steps + assembling diagram | Applications, UTL functions, chains | Scrub: layers appear and lines draw (storytelling) |
 | 5 | Lifecycle | Comparison split + full-width state track | How it works + deterministic state | Live state machine with replay or failure (state) |
-| 6 | Ownership & security | Statement + 5-cell asymmetric bento | Ownership model + security principles | Reveal stagger (sequence) |
+| 6 | Ownership & security | Statement + ownership ledger (move ownership, asset counter stays 0) + bridge/Wire route toggle | Ownership model + all 7 security principles | Route swaps to Wire once on enter; ledger rows on click |
 | 7 | Agents ✱ | Tabs (agents / people) | Built for AI agents + human experience | Tab switch; chain-anxiety questions strike through (state) |
-| 8 | Primitives | Horizontal pan (desktop), stack (mobile) | UPAP, WNS, Crypto SSO, Trustless hardware | Vertical scroll pans the track (storytelling) |
+| 8 | Primitives | Horizontal pan (desktop), stack (mobile); each card carries a working specimen (UPAP fan-out, WNS route via bucket contracts and settle.wns, SSO one sign-in to 7 chains, HW open stack) | UPAP, WNS, Crypto SSO, Trustless hardware | Pan scrubs; the focused card plays its specimen once |
 | 9 | Performance | Oversized metric + spec grid | 10,000+ TPS + 5 specs, labelled as stated targets | Count-up (hierarchy) |
 | 10 | Developers | Index list | Stack (nodeop, kiod, clio, CDT, Wire Hub), links to `/developers` | Row hover feedback |
 | 11 | Vision + CTA | Stacked rows + roadmap line + CTA | Three outcomes, testnet/mainnet status, final CTA | Roadmap line draws to "now" |

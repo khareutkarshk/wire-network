@@ -1,71 +1,482 @@
 ---
 import { Icon } from 'astro-icon/components';
 import Section from '../ui/Section.astro';
-import Panel from '../ui/Panel.astro';
+import ChainLogo from '../ui/ChainLogo.astro';
+import LifecycleChip from '../ui/LifecycleChip.astro';
 
-const benefits = [
-	'Native-chain asset custody',
-	'Cross-chain ownership coordination',
-	'Less dependence on wrapped assets',
-	'One unified transaction state',
-	'Queryable ownership records',
+// Ownership can hop between these; the asset never leaves Ethereum (data.md: Ownership model)
+const owners = [
+	{ name: 'Ethereum', icon: 'cryptocurrency:eth' },
+	{ name: 'Solana', icon: 'cryptocurrency:sol' },
+	{ name: 'Cardano', icon: 'cryptocurrency:ada' },
+	{ name: 'BNB Chain', icon: 'cryptocurrency:bnb' },
 ];
+
+// data.md: Security, structural principles. Four are chokepoints Wire removes, three are built into execution.
+const chokepoints = [
+	{ title: 'Custody pool', note: 'Assets parked in a bridge', icon: 'ph:vault' },
+	{ title: 'Wrapped-token issuer', note: 'Mints the IOU', icon: 'ph:coins' },
+	{ title: 'Middleware relayer', note: 'One operator in the path', icon: 'ph:broadcast' },
+];
+const removed = ['Assets parked in a shared custody pool', 'Wrapped-token dependency', 'Centralized burn-and-mint issuer', 'Single middleware custody bottleneck'];
+const builtIn = ['Cryptographic transaction validation', 'Economically enforced execution', 'Defined recovery paths'];
 ---
 
 <Section id="security" labelledby="ownership-title">
-	<div class="grid gap-10 lg:grid-cols-12">
+	<div class="grid gap-10 lg:grid-cols-12 lg:items-end">
 		<h2 id="ownership-title" class="text-h2 font-medium lg:col-span-7" data-split>
 			<span class="block text-fg-1">The asset stays native.</span>
 			<span class="block text-fg-3">The ownership state becomes portable.</span>
 		</h2>
-		<div class="lg:col-span-4 lg:col-start-9 lg:pt-2">
-			<p class="text-fg-2" data-reveal>
-				Wire never moves assets into a common custody pool. It coordinates cryptographic records of control and ownership across the chains you already use.
-			</p>
-			<ul class="mt-6 flex flex-col gap-2.5 text-sm text-fg-1" data-reveal data-reveal-delay="0.06">
-				{benefits.map((b) => (
-					<li class="flex items-center gap-2.5">
-						<Icon name="ph:check" class="size-3.5 text-accent-soft" aria-hidden="true" />
-						{b}
+		<p class="max-w-[46ch] text-fg-2 lg:col-span-4 lg:col-start-9" data-reveal>
+			Wire never moves assets into a common custody pool. It coordinates cryptographic records of control and ownership across the chains you already use.
+		</p>
+	</div>
+
+	<!-- 1. Ownership ledger: move ownership, watch the asset not move -->
+	<div class="ledger mt-14 overflow-hidden rounded-panel border border-line" data-ledger data-reveal>
+		<div class="grid md:grid-cols-[1fr_auto_1.35fr]">
+			<!-- Asset: pinned -->
+			<div class="flex flex-col p-6 md:p-8">
+				<p class="flex h-7 items-center font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">The asset</p>
+				<div class="mt-6 flex items-center gap-4">
+					<span class="tile tile-lg relative">
+						<ChainLogo icon="cryptocurrency:eth" name="Ethereum" class="size-6" />
+						<span class="lock"><Icon name="ph:lock-simple-fill" class="size-3" aria-hidden="true" /></span>
+					</span>
+					<div>
+						<p class="font-mono text-xl text-fg-1">1,250.00 USDC</p>
+						<p class="mt-0.5 text-sm text-fg-2">Held natively on Ethereum</p>
+					</div>
+				</div>
+				<ol class="history mt-8 flex flex-col font-mono text-mono-s" data-asset-history>
+					<li class="flex items-center justify-between gap-4 border-t border-line py-2.5 text-fg-3">
+						<span>Deposited on Ethereum</span>
+						<span>#0</span>
 					</li>
-				))}
-			</ul>
+				</ol>
+
+				<dl class="mt-auto grid grid-cols-2 gap-4 pt-8">
+					<div>
+						<dt class="text-sm text-fg-3">Times moved</dt>
+						<dd class="mt-1 font-mono text-[2.5rem] leading-none tracking-[-0.03em] text-fg-1" data-asset-moves>0</dd>
+					</div>
+					<div>
+						<dt class="text-sm text-fg-3">Wrapped copies</dt>
+						<dd class="mt-1 font-mono text-[2.5rem] leading-none tracking-[-0.03em] text-fg-1">0</dd>
+					</div>
+				</dl>
+			</div>
+
+			<!-- Divider with the coordination link -->
+			<div class="relative hidden w-24 md:block" aria-hidden="true">
+				<div class="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-line"></div>
+				<div class="link absolute top-1/2 left-1/2 grid size-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-control border border-line-strong bg-ink-900">
+					<Icon name="wire" class="h-2.5 w-auto text-accent-soft" />
+				</div>
+			</div>
+
+			<!-- Ownership: portable -->
+			<div class="flex flex-col border-t border-line p-6 md:border-t-0 md:p-8 own-col">
+				<div class="flex items-center justify-between gap-4">
+					<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">The ownership state</p>
+					<LifecycleChip state="settled" data-own-chip />
+				</div>
+				<div class="mt-6 flex items-center gap-4">
+					<span class="tile tile-lg" data-own-tile>
+						{owners.map((o, i) => <span class:list={['own-logo', i !== 0 && 'hidden']} data-own-logo={i}><ChainLogo icon={o.icon} name={o.name} class="size-6" /></span>)}
+					</span>
+					<div>
+						<p class="text-xl text-fg-1">Owner on <span data-own-name>Ethereum</span></p>
+						<p class="mt-0.5 text-sm text-fg-2">Recorded on Wire, queryable from any connected chain</p>
+					</div>
+				</div>
+
+				<ol class="history mt-8 flex flex-col font-mono text-mono-s" aria-live="polite" data-own-history>
+					<li class="flex items-center justify-between gap-4 border-t border-line py-2.5 text-fg-3">
+						<span>Ownership recorded on Ethereum</span>
+						<span>#0</span>
+					</li>
+				</ol>
+
+				<div class="mt-auto flex flex-wrap items-center justify-between gap-4 pt-8">
+					<dl>
+						<dt class="text-sm text-fg-3">Times ownership moved</dt>
+						<dd class="mt-1 font-mono text-[2.5rem] leading-none tracking-[-0.03em] text-accent-soft" data-own-moves>0</dd>
+					</dl>
+					<button type="button" class="move inline-flex h-11 items-center gap-2 rounded-control bg-fg-1 px-5 text-[0.9375rem] font-medium text-ink-950" data-own-move>
+						Move ownership to <span data-own-next>Solana</span>
+						<Icon name="ph:arrow-right" class="size-4" aria-hidden="true" />
+					</button>
+				</div>
+			</div>
 		</div>
 	</div>
 
-	<!-- Security by structure: 5 principles, 5 cells -->
-	<div class="mt-16 grid auto-rows-[minmax(11rem,auto)] gap-4 md:grid-cols-6">
-		<Panel surface="tint" class="flex flex-col justify-between gap-10 p-7 md:col-span-3 md:row-span-2 md:p-9" data-reveal>
-			<div class="flex items-center gap-3">
-				<Icon name="ph:shield-check" class="size-7 text-accent-soft" aria-hidden="true" />
-				<p class="text-sm font-medium text-fg-2">Security by structure</p>
-			</div>
-			<p class="text-[clamp(1.5rem,1.1rem+1.4vw,2.25rem)] leading-[1.15] tracking-[-0.025em] text-fg-1">
-				Remove the custody chokepoint instead of adding more security around it.
-			</p>
-		</Panel>
-		<Panel class="flex flex-col justify-end p-6 md:col-span-3" data-reveal data-reveal-delay="0.06">
-			<Icon name="ph:link-break" class="size-6 text-fg-2" aria-hidden="true" />
-			<p class="mt-auto pt-8 text-h3 font-medium text-fg-1">No wrapped tokens. No burn-and-mint issuer.</p>
-		</Panel>
-		<Panel surface="grid" class="flex flex-col justify-end p-6 md:col-span-3" data-reveal data-reveal-delay="0.12">
-			<Icon name="ph:graph" class="size-6 text-fg-2" aria-hidden="true" />
-			<p class="mt-auto pt-8 text-h3 font-medium text-fg-1">No single middleware custody bottleneck</p>
-		</Panel>
-		<Panel class="flex flex-col justify-end p-6 md:col-span-2" data-reveal>
-			<Icon name="ph:fingerprint" class="size-6 text-fg-2" aria-hidden="true" />
-			<p class="mt-auto pt-8 text-lg font-medium text-fg-1">Cryptographic transaction validation</p>
-		</Panel>
-		<Panel class="flex flex-col justify-between gap-8 p-6 md:col-span-4 md:flex-row md:items-end" data-reveal data-reveal-delay="0.06">
+	<!-- 2. Security by structure: what the route looks like with and without the chokepoints -->
+	<div class="sec mt-6 rounded-panel border border-line p-6 md:p-8" data-sec data-mode="bridge" data-reveal>
+		<div class="flex flex-col justify-between gap-6 md:flex-row md:items-start">
 			<div>
-				<Icon name="ph:scales" class="size-6 text-fg-2" aria-hidden="true" />
-				<p class="mt-8 text-lg font-medium text-fg-1">Economically enforced execution</p>
-				<p class="mt-1 text-fg-2">with a defined recovery path when it fails.</p>
+				<p class="flex items-center gap-2.5 text-sm font-medium text-fg-2">
+					<Icon name="ph:shield-check" class="size-5 text-accent-soft" aria-hidden="true" />
+					Security by structure
+				</p>
+				<p class="mt-4 max-w-[30ch] text-[clamp(1.375rem,1.1rem+1vw,1.875rem)] leading-[1.15] tracking-[-0.02em] text-fg-1">
+					Remove the custody chokepoint instead of adding more security around it.
+				</p>
 			</div>
-			<div class="flex shrink-0 gap-2">
-				<span class="rounded-control border border-state-settled/30 bg-state-settled/5 px-2.5 py-1 font-mono text-mono-xs uppercase tracking-widest text-state-settled">Settled</span>
-				<span class="rounded-control border border-state-recovering/30 bg-state-recovering/5 px-2.5 py-1 font-mono text-mono-xs uppercase tracking-widest text-state-recovering">Recovered</span>
+			<div class="seg flex shrink-0 rounded-control border border-line p-1" role="radiogroup" aria-label="Route to compare">
+				<button type="button" role="radio" aria-checked="true" class="rounded-[4px] px-3.5 py-1.5 text-sm" data-sec-mode="bridge">Bridge route</button>
+				<button type="button" role="radio" aria-checked="false" class="rounded-[4px] px-3.5 py-1.5 text-sm" data-sec-mode="wire">Wire route</button>
 			</div>
-		</Panel>
+		</div>
+
+		<!-- Route -->
+		<div class="route mt-10 flex flex-col items-stretch gap-3 md:flex-row md:items-center md:gap-0">
+			<div class="end">
+				<span class="tile"><ChainLogo icon="cryptocurrency:eth" name="Ethereum" class="size-4" /></span>
+				<span class="text-sm text-fg-1">Ethereum</span>
+			</div>
+			<span class="seg-line" aria-hidden="true"></span>
+
+			<!-- Middle: two layers that swap -->
+			<div class="middle relative md:flex-1">
+				<ul class="layer layer-bridge flex flex-col gap-3 md:flex-row md:items-center" aria-label="Bridge route chokepoints">
+					{
+						chokepoints.map((c, i) => (
+							<>
+								{i > 0 && <span class="seg-line seg-dash" aria-hidden="true" />}
+								<li class="choke flex-1">
+									<Icon name={c.icon} class="size-4 shrink-0 text-fg-2" aria-hidden="true" />
+									<span class="min-w-0">
+										<span class="block text-sm text-fg-1">{c.title}</span>
+										<span class="block text-xs text-fg-3">{c.note}</span>
+									</span>
+								</li>
+							</>
+						))
+					}
+				</ul>
+				<div class="layer layer-wire absolute inset-0 flex items-center" aria-hidden="true">
+					<div class="wire-node flex w-full flex-wrap items-center gap-x-4 gap-y-3">
+						<span class="grid size-9 shrink-0 place-items-center rounded-control bg-accent/15">
+							<Icon name="wire" class="h-2.5 w-auto text-accent-soft" />
+						</span>
+						<span class="shrink-0 text-sm font-medium text-fg-1">Wire</span>
+						<span class="flex basis-full flex-wrap gap-1.5 md:basis-auto md:flex-1 md:justify-center">
+							{builtIn.map((b) => <span class="prop">{b.replace('Cryptographic transaction validation', 'Cryptographic validation').replace('Defined recovery paths', 'Recovery path')}</span>)}
+						</span>
+					</div>
+				</div>
+			</div>
+
+			<span class="seg-line" aria-hidden="true"></span>
+			<div class="end">
+				<span class="tile"><ChainLogo icon="cryptocurrency:sol" name="Solana" class="size-4" /></span>
+				<span class="text-sm text-fg-1">Solana</span>
+			</div>
+		</div>
+
+		<!-- The seven principles, split by what they do -->
+		<div class="mt-10 grid gap-6 border-t border-line pt-6 md:grid-cols-2">
+			<div>
+				<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Removed by design</p>
+				<ul class="mt-3 flex flex-col gap-2 text-sm">
+					{removed.map((r) => (
+						<li class="removed flex items-center gap-2.5 text-fg-2">
+							<Icon name="ph:x" class="size-3.5 shrink-0 text-fg-3" aria-hidden="true" />
+							<span class="strike">{r}</span>
+						</li>
+					))}
+				</ul>
+			</div>
+			<div>
+				<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Built into execution</p>
+				<ul class="mt-3 flex flex-col gap-2 text-sm">
+					{builtIn.map((b) => (
+						<li class="flex items-center gap-2.5 text-fg-1">
+							<Icon name="ph:check" class="size-3.5 shrink-0 text-accent-soft" aria-hidden="true" />
+							{b}
+						</li>
+					))}
+				</ul>
+			</div>
+		</div>
 	</div>
 </Section>
+
+<style>
+	.ledger,
+	.sec {
+		background: var(--color-ink-950);
+		box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+	}
+	.own-col {
+		background: linear-gradient(135deg, rgb(47 107 255 / 0.07), transparent 60%);
+	}
+	.tile {
+		display: inline-flex;
+		width: 2.25rem;
+		height: 2.25rem;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--radius-control);
+		border: 1px solid var(--color-line-strong);
+		background: var(--color-ink-800);
+		color: var(--color-fg-1);
+		box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
+	}
+	.tile-lg {
+		width: 3.25rem;
+		height: 3.25rem;
+	}
+	.lock {
+		position: absolute;
+		right: -6px;
+		bottom: -6px;
+		display: grid;
+		width: 18px;
+		height: 18px;
+		place-items: center;
+		border-radius: 5px;
+		background: var(--color-fg-1);
+		color: var(--color-ink-950);
+	}
+	.link {
+		box-shadow: 0 0 0 6px var(--color-ink-950);
+	}
+	.history li.is-new {
+		color: var(--color-fg-1);
+	}
+	[data-asset-history] li.is-new {
+		color: var(--color-fg-2);
+	}
+	.history li.is-new {
+		animation: row-in 0.6s var(--ease-out-expo);
+	}
+	@keyframes row-in {
+		from { opacity: 0; transform: translateY(-6px); }
+	}
+	.move {
+		transition: background-color var(--duration-ui), transform var(--duration-ui) var(--ease-out-expo);
+	}
+	.move:hover {
+		background: #fff;
+	}
+	.move:active {
+		transform: translateY(1px) scale(0.985);
+	}
+	.move:disabled {
+		opacity: 0.6;
+	}
+	.tile.is-hop {
+		animation: hop 0.6s var(--ease-out-expo);
+	}
+	@keyframes hop {
+		0% { transform: translateY(0); }
+		35% { transform: translateY(-6px); border-color: var(--color-accent); }
+		100% { transform: translateY(0); }
+	}
+
+	/* Security route */
+	.end {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+	.seg-line {
+		/* Mobile: vertical, under the tile centres */
+		align-self: flex-start;
+		margin-left: calc(1.125rem - 0.5px);
+		width: 1px;
+		height: 1rem;
+		background: var(--color-line-strong);
+		transition: background-color var(--duration-reveal) var(--ease-out-expo);
+	}
+	@media (min-width: 48rem) {
+		.seg-line {
+			flex: 0 1 4.5rem;
+			min-width: 1.25rem;
+			align-self: center;
+			width: auto;
+			height: 1px;
+			margin: 0 0.75rem;
+		}
+		.seg-dash {
+			flex-basis: 1.5rem;
+		}
+	}
+	.seg-dash {
+		background: repeating-linear-gradient(90deg, var(--color-line-strong) 0 4px, transparent 4px 8px);
+	}
+	.choke {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		border-radius: var(--radius-control);
+		border: 1px dashed var(--color-line-strong);
+		background: var(--color-ink-900);
+		padding: 0.75rem 0.875rem;
+	}
+	.layer {
+		transition: opacity var(--duration-reveal) var(--ease-out-expo), transform var(--duration-reveal) var(--ease-out-expo), filter var(--duration-reveal) var(--ease-out-expo);
+	}
+	.layer-wire {
+		opacity: 0;
+		transform: scale(0.96);
+		pointer-events: none;
+	}
+	.wire-node {
+		border-radius: var(--radius-panel);
+		border: 1px solid rgb(126 165 255 / 0.4);
+		background: linear-gradient(180deg, rgb(47 107 255 / 0.12), rgb(47 107 255 / 0.04));
+		padding: 0.75rem 1rem;
+		box-shadow: 0 0 40px rgb(47 107 255 / 0.18);
+	}
+	.prop {
+		border-radius: 4px;
+		border: 1px solid var(--color-line-strong);
+		padding: 0.2rem 0.5rem;
+		font-family: var(--font-mono);
+		font-size: var(--text-mono-xs);
+		color: var(--color-fg-1);
+		white-space: nowrap;
+	}
+	.sec[data-mode='wire'] .layer-bridge {
+		opacity: 0;
+		transform: scale(0.98);
+		filter: blur(4px);
+		pointer-events: none;
+	}
+	.sec[data-mode='wire'] .layer-wire {
+		opacity: 1;
+		transform: none;
+	}
+	.sec[data-mode='wire'] .seg-line {
+		background: var(--color-accent);
+		box-shadow: 0 0 10px rgb(47 107 255 / 0.8);
+	}
+	.seg button {
+		color: var(--color-fg-3);
+		transition: color var(--duration-ui), background-color var(--duration-ui);
+	}
+	.seg button:hover {
+		color: var(--color-fg-1);
+	}
+	.seg button[aria-checked='true'] {
+		color: var(--color-fg-1);
+		background: var(--color-ink-700);
+	}
+	/* The removed list strikes through only once Wire is showing */
+	.strike {
+		background: linear-gradient(currentColor, currentColor) 0 55% / 0% 1px no-repeat;
+		transition: background-size var(--duration-reveal) var(--ease-out-expo), color var(--duration-reveal);
+	}
+	.sec[data-mode='wire'] .strike {
+		background-size: 100% 1px;
+		color: var(--color-fg-3);
+	}
+	.sec[data-mode='wire'] .removed:nth-child(2) .strike { transition-delay: 60ms; }
+	.sec[data-mode='wire'] .removed:nth-child(3) .strike { transition-delay: 120ms; }
+	.sec[data-mode='wire'] .removed:nth-child(4) .strike { transition-delay: 180ms; }
+</style>
+
+<script>
+	import { ScrollTrigger, prefersReducedMotion } from '../../lib/motion';
+
+	const reduce = prefersReducedMotion();
+
+	// Ownership ledger
+	document.querySelectorAll<HTMLElement>('[data-ledger]').forEach((root) => {
+		const names = ['Ethereum', 'Solana', 'Cardano', 'BNB Chain'];
+		const btn = root.querySelector<HTMLButtonElement>('[data-own-move]')!;
+		const next = root.querySelector<HTMLElement>('[data-own-next]')!;
+		const name = root.querySelector<HTMLElement>('[data-own-name]')!;
+		const moves = root.querySelector<HTMLElement>('[data-own-moves]')!;
+		const history = root.querySelector<HTMLOListElement>('[data-own-history]')!;
+		const chip = root.querySelector<HTMLElement>('[data-own-chip]')!;
+		const tile = root.querySelector<HTMLElement>('[data-own-tile]')!;
+		const assetHistory = root.querySelector<HTMLOListElement>('[data-asset-history]')!;
+		const addRow = (list: HTMLOListElement, text: string, n: number) => {
+			const li = document.createElement('li');
+			li.className = 'is-new flex items-center justify-between gap-4 border-t border-line py-2.5';
+			li.innerHTML = '<span></span><span class="text-fg-3"></span>';
+			li.children[0].textContent = text;
+			li.children[1].textContent = `#${n}`;
+			list.prepend(li);
+			list.querySelectorAll('li.is-new').forEach((el, i) => i > 0 && el.classList.remove('is-new'));
+			while (list.children.length > 3) list.lastElementChild!.remove();
+		};
+		const logos = [...root.querySelectorAll<HTMLElement>('[data-own-logo]')];
+		const setChip = (s: string) => {
+			chip.dataset.state = s;
+			chip.querySelector('.lifecycle-label')!.textContent = s;
+		};
+		let at = 0;
+		let count = 0;
+
+		btn.addEventListener('click', () => {
+			const from = at;
+			const to = (at + 1) % names.length;
+			btn.disabled = true;
+			setChip('executing');
+			window.setTimeout(
+				() => {
+					at = to;
+					count++;
+					logos.forEach((l, i) => l.classList.toggle('hidden', i !== to));
+					name.textContent = names[to];
+					moves.textContent = String(count);
+					next.textContent = names[(to + 1) % names.length];
+					addRow(history, `Owner ${names[from]} → ${names[to]}`, count);
+					addRow(assetHistory, 'Still on Ethereum', count);
+					if (!reduce) {
+						tile.classList.remove('is-hop');
+						void tile.offsetWidth;
+						tile.classList.add('is-hop');
+					}
+					setChip('settled');
+					btn.disabled = false;
+				},
+				reduce ? 0 : 650,
+			);
+		});
+	});
+
+	// Security route toggle
+	document.querySelectorAll<HTMLElement>('[data-sec]').forEach((root) => {
+		const radios = [...root.querySelectorAll<HTMLButtonElement>('[data-sec-mode]')];
+		const bridge = root.querySelector('.layer-bridge')!;
+		const wire = root.querySelector('.layer-wire')!;
+		let touched = false;
+		const set = (mode: string) => {
+			root.dataset.mode = mode;
+			radios.forEach((r) => r.setAttribute('aria-checked', String(r.dataset.secMode === mode)));
+			bridge.setAttribute('aria-hidden', String(mode !== 'bridge'));
+			wire.setAttribute('aria-hidden', String(mode !== 'wire'));
+		};
+		radios.forEach((r, i) => {
+			r.addEventListener('click', () => {
+				touched = true;
+				set(r.dataset.secMode!);
+			});
+			r.addEventListener('keydown', (e) => {
+				if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+				e.preventDefault();
+				const o = radios[(i + 1) % radios.length];
+				o.focus();
+				o.click();
+			});
+		});
+		// Show the bridge route first, then remove the chokepoints once the reader has seen them
+		if (reduce) set('wire');
+		else
+			ScrollTrigger.create({
+				trigger: root,
+				start: 'top 60%',
+				once: true,
+				onEnter: () => window.setTimeout(() => !touched && set('wire'), 1400),
+			});
+	});
+</script>

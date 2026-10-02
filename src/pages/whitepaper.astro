@@ -1,0 +1,498 @@
+---
+import { Icon } from 'astro-icon/components';
+import Base from '../layouts/Base.astro';
+import Container from '../components/ui/Container.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+import Button from '../components/ui/Button.astro';
+import { WHITEPAPER_GITHUB_HREF, WHITEPAPER_PDF_SOURCES } from '../lib/site';
+
+// Static facts from the paper's title page. Version, pages, reading time and contents are read from the PDF itself.
+const PAPER_TITLE =
+	'Wire Network: Revolutionizing the Internet with Trustless Alternatives to Web 2.0 Protocols, IT Infrastructure, and Application Layer Solutions';
+const AUTHORS = 'Kyle Dolan, Ken DiCross, Joseph Rubin, Jack Rogers';
+const LOCAL_PDF = WHITEPAPER_PDF_SOURCES.at(-1)!;
+---
+
+<Base title="Whitepaper | Wire Network" description="Read the Wire Network whitepaper: consensus, governance, the Universal Transaction Layer, Crypto SSO and the network economy.">
+	<!-- Header -->
+	<section class="relative overflow-hidden pt-36 pb-12 md:pt-44 md:pb-16" aria-labelledby="wp-title">
+		<div class="wp-hero-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
+		<Container>
+			<div class="grid gap-10 lg:grid-cols-12 lg:items-end">
+				<div class="lg:col-span-8">
+					<Eyebrow>Whitepaper</Eyebrow>
+					<h1 id="wp-title" class="mt-6 text-[clamp(2.75rem,1.4rem+4.6vw,5.25rem)] leading-[1] tracking-[-0.04em] font-medium text-fg-1" data-split>
+						The protocol, in full.
+					</h1>
+					<p class="mt-7 max-w-[44rem] text-body-l text-fg-2" data-reveal>{PAPER_TITLE}</p>
+					<p class="mt-4 text-sm text-fg-3" data-reveal data-reveal-delay="0.04">{AUTHORS}</p>
+				</div>
+				<div class="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end" data-reveal data-reveal-delay="0.08">
+					<Button href={WHITEPAPER_GITHUB_HREF} variant="secondary" external>View on GitHub</Button>
+					<Button href={LOCAL_PDF} icon="ph:download-simple" download="Wire-Network-Whitepaper.pdf" data-wp-download>Download PDF</Button>
+				</div>
+			</div>
+
+			<dl class="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-panel border border-line bg-line md:grid-cols-4" data-reveal data-reveal-delay="0.12">
+				<div class="bg-ink-950 px-5 py-4">
+					<dt class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Version</dt>
+					<dd class="mt-1.5 font-mono text-fg-1" data-wp-version>Living document</dd>
+				</div>
+				<div class="bg-ink-950 px-5 py-4">
+					<dt class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Pages</dt>
+					<dd class="mt-1.5 font-mono text-fg-1" data-wp-pages>&nbsp;</dd>
+				</div>
+				<div class="bg-ink-950 px-5 py-4">
+					<dt class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Reading time</dt>
+					<dd class="mt-1.5 font-mono text-fg-1" data-wp-read>&nbsp;</dd>
+				</div>
+				<div class="bg-ink-950 px-5 py-4">
+					<dt class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Sections</dt>
+					<dd class="mt-1.5 font-mono text-fg-1" data-wp-count>&nbsp;</dd>
+				</div>
+			</dl>
+		</Container>
+	</section>
+
+	<!-- Reader -->
+	<section class="border-t border-line pb-24" aria-label="Whitepaper reader" data-wp>
+		<Container>
+			<div class="grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] xl:grid-cols-[17rem_minmax(0,1fr)]">
+				<!-- Contents, desktop -->
+				<aside class="hidden lg:block">
+					<nav class="sticky top-[5.5rem] pt-10" aria-label="Whitepaper contents">
+						<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Contents</p>
+						<ol class="toc mt-5 flex flex-col" data-wp-toc></ol>
+						<div class="mt-8 h-px bg-line">
+							<div class="h-px origin-left scale-x-0 bg-accent transition-transform duration-(--duration-reveal) ease-out-expo" data-wp-progress></div>
+						</div>
+					</nav>
+				</aside>
+
+				<div class="min-w-0">
+					<!-- Toolbar -->
+					<div class="toolbar sticky top-16 z-10 -mx-4 flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:mx-0 sm:px-0">
+						<details class="toc-mobile relative lg:hidden" data-wp-toc-mobile>
+							<summary class="tool inline-flex cursor-pointer list-none items-center gap-2 rounded-control px-2.5 py-1.5 text-sm text-fg-1">
+								<Icon name="ph:list" class="size-4" aria-hidden="true" />
+								Contents
+							</summary>
+							<div class="absolute top-full left-0 mt-2 max-h-[60vh] w-[min(20rem,80vw)] overflow-y-auto rounded-panel border border-line-strong bg-ink-900 p-3">
+								<ol class="toc flex flex-col" data-wp-toc></ol>
+							</div>
+						</details>
+						<p class="hidden font-mono text-mono-s text-fg-3 lg:block" aria-live="polite">
+							Page <span class="text-fg-1" data-wp-current>1</span> of <span data-wp-total>&nbsp;</span>
+						</p>
+						<div class="flex items-center gap-1">
+							<button type="button" class="tool size-8 rounded-control" aria-label="Zoom out" data-wp-zoom="-1">
+								<Icon name="ph:minus" class="mx-auto size-4" aria-hidden="true" />
+							</button>
+							<output class="w-12 text-center font-mono text-mono-s text-fg-2" data-wp-zoom-label>100%</output>
+							<button type="button" class="tool size-8 rounded-control" aria-label="Zoom in" data-wp-zoom="1">
+								<Icon name="ph:plus" class="mx-auto size-4" aria-hidden="true" />
+							</button>
+							<span class="mx-2 h-5 w-px bg-line" aria-hidden="true"></span>
+							<button type="button" class="tool inline-flex h-8 items-center gap-2 rounded-control px-2.5 text-sm" aria-pressed="false" data-wp-night>
+								<Icon name="ph:moon" class="size-4" aria-hidden="true" />
+								<span class="hidden sm:inline">Night pages</span>
+							</button>
+						</div>
+					</div>
+
+					<!-- Pages -->
+					<div class="overflow-x-auto pt-8" data-wp-scroller>
+						<div class="stack mx-auto flex flex-col gap-6" data-wp-stack>
+							<div class="sheet skeleton" style="aspect-ratio: 612 / 792" data-wp-skeleton>
+								<p class="absolute inset-0 grid place-items-center font-mono text-mono-s text-fg-3">Loading whitepaper</p>
+							</div>
+						</div>
+						<div class="hidden rounded-panel border border-line bg-ink-900 p-8 text-center" role="alert" data-wp-error>
+							<Icon name="ph:warning" class="mx-auto size-6 text-state-recovering" aria-hidden="true" />
+							<p class="mt-4 text-fg-1">The reader couldn't load the PDF.</p>
+							<p class="mt-2 text-fg-2">
+								Open it on <a class="text-accent-soft underline underline-offset-4" href={WHITEPAPER_GITHUB_HREF} target="_blank" rel="noopener noreferrer">GitHub</a>
+								or <a class="text-accent-soft underline underline-offset-4" href={LOCAL_PDF} download>download it</a> instead.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</Container>
+	</section>
+</Base>
+
+<style>
+	.wp-hero-bg {
+		background:
+			radial-gradient(45% 60% at 80% 30%, rgb(47 107 255 / 0.12), transparent 70%),
+			linear-gradient(var(--color-line) 1px, transparent 1px),
+			linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+		background-size: auto, 56px 56px, 56px 56px;
+		mask-image: linear-gradient(to bottom, #000 30%, transparent 100%);
+	}
+	.toolbar {
+		background: rgb(5 7 10 / 0.82);
+		backdrop-filter: blur(12px);
+	}
+	.tool {
+		color: var(--color-fg-2);
+		transition: color var(--duration-ui), background-color var(--duration-ui);
+	}
+	.tool:hover,
+	.tool[aria-pressed='true'],
+	details[open] > .tool {
+		color: var(--color-fg-1);
+		background: var(--color-ink-800);
+	}
+	.tool:disabled {
+		opacity: 0.35;
+		pointer-events: none;
+	}
+	.stack {
+		--zoom: 1;
+		width: calc(min(100%, 54rem) * var(--zoom));
+	}
+	/* Paper sheets sit on the ink like printed pages */
+	:global(.sheet) {
+		position: relative;
+		width: 100%;
+		border-radius: 4px;
+		overflow: hidden;
+		background: #fff;
+		box-shadow:
+			0 0 0 1px rgb(255 255 255 / 0.06),
+			0 30px 60px -30px rgb(0 0 0 / 0.8);
+		--scale-round-x: 1px;
+		--scale-round-y: 1px;
+	}
+	:global(.sheet canvas) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		transition: filter var(--duration-reveal) var(--ease-out-expo);
+	}
+	.skeleton {
+		background: var(--color-ink-900);
+	}
+	/* Night pages: invert the paper but keep hues, so charts and links stay recognisable */
+	:global([data-wp].is-night .sheet) {
+		background: #14181f;
+	}
+	:global([data-wp].is-night .sheet canvas) {
+		filter: invert(0.9) hue-rotate(180deg) contrast(0.92);
+	}
+
+	/* Contents */
+	:global(.toc a) {
+		display: grid;
+		grid-template-columns: 1.75rem 1fr;
+		gap: 0.25rem;
+		padding: 0.45rem 0 0.45rem 0.75rem;
+		border-left: 1px solid var(--color-line);
+		font-size: 0.875rem;
+		line-height: 1.35;
+		color: var(--color-fg-3);
+		transition: color var(--duration-ui), border-color var(--duration-ui);
+	}
+	:global(.toc a:hover) {
+		color: var(--color-fg-1);
+	}
+	:global(.toc a[aria-current='true']) {
+		color: var(--color-fg-1);
+		border-left-color: var(--color-accent);
+	}
+	:global(.toc .n) {
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		padding-top: 0.1rem;
+	}
+	:global(.toc-mobile .toc a) {
+		border-left: 0;
+		padding-left: 0.25rem;
+	}
+
+	/* Minimal pdf.js text layer so text can be selected, copied and found with the browser's search */
+	:global(.textLayer) {
+		position: absolute;
+		inset: 0;
+		overflow: clip;
+		line-height: 1;
+		text-align: initial;
+		transform-origin: 0 0;
+		--min-font-size: 1;
+		--text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+		--min-font-size-inv: calc(1 / var(--min-font-size));
+	}
+	:global(.textLayer :is(span, br)) {
+		color: transparent;
+		position: absolute;
+		white-space: pre;
+		cursor: text;
+		transform-origin: 0% 0%;
+	}
+	:global(.textLayer > :not(.markedContent)),
+	:global(.textLayer .markedContent span:not(.markedContent)) {
+		--font-height: 0;
+		font-size: calc(var(--text-scale-factor) * var(--font-height));
+		--scale-x: 1;
+		--rotate: 0deg;
+		transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+	}
+	:global(.textLayer .markedContent) {
+		display: contents;
+	}
+	:global(.textLayer ::selection) {
+		background: rgb(47 107 255 / 0.3);
+	}
+	:global(.textLayer .endOfContent) {
+		display: block;
+		position: absolute;
+		inset: 100% 0 0;
+		user-select: none;
+	}
+	:global(.wp-anchor) {
+		position: absolute;
+		left: 0;
+		width: 1px;
+		height: 1px;
+		scroll-margin-top: 8.5rem;
+	}
+</style>
+
+<script>
+	import * as pdfjs from 'pdfjs-dist';
+	import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+	import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
+	import { lenisInstance } from '../lib/motion';
+	import { WHITEPAPER_PDF_SOURCES } from '../lib/site';
+
+	pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+
+	const root = document.querySelector<HTMLElement>('[data-wp]')!;
+	const stack = root.querySelector<HTMLElement>('[data-wp-stack]')!;
+	const tocs = [...root.querySelectorAll<HTMLOListElement>('[data-wp-toc]')];
+	const zoomLabel = root.querySelector<HTMLOutputElement>('[data-wp-zoom-label]')!;
+	const zoomBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-wp-zoom]')];
+	const nightBtn = root.querySelector<HTMLButtonElement>('[data-wp-night]')!;
+	const progress = root.querySelector<HTMLElement>('[data-wp-progress]');
+	const setText = (sel: string, v: string) => document.querySelectorAll(sel).forEach((el) => (el.textContent = v));
+
+	const ZOOMS = [0.75, 1, 1.25, 1.5];
+	let zoomIdx = 1;
+	let doc: PDFDocumentProxy;
+	type Sheet = { el: HTMLElement; canvas: HTMLCanvasElement; page?: PDFPageProxy; renderedAt: number; text: boolean };
+	const sheets: Sheet[] = [];
+
+	async function load() {
+		for (const url of WHITEPAPER_PDF_SOURCES) {
+			try {
+				const res = await fetch(url);
+				if (!res.ok) continue;
+				const data = new Uint8Array(await res.arrayBuffer());
+				// The download button hands over exactly the version on screen
+				const blob = new Blob([data.slice()], { type: 'application/pdf' });
+				document.querySelector<HTMLAnchorElement>('[data-wp-download]')!.href = URL.createObjectURL(blob);
+				return await pdfjs.getDocument({ data }).promise;
+			} catch {
+				// try the next source
+			}
+		}
+		throw new Error('No whitepaper source reachable');
+	}
+
+	// Top-level headings ("1 Introduction" ... "References") are the larger bold runs on each page
+	async function readStructure() {
+		const sections: { n: string; title: string; page: number; top: number }[] = [];
+		let words = 0;
+		let version = '';
+		for (let i = 1; i <= doc.numPages; i++) {
+			const page = await doc.getPage(i);
+			const { height } = page.getViewport({ scale: 1 });
+			const tc = await page.getTextContent();
+			for (const it of tc.items) {
+				if (!('str' in it)) continue;
+				words += it.str.split(/\s+/).filter(Boolean).length;
+				const s = it.str.trim();
+				if (i === 1 && !version && /^v\d+\.\d+\.\d+$/.test(s)) version = s;
+				if (it.height < 10.5) continue;
+				const m = s.match(/^(\d{1,2})\s+([A-Z].{2,60})$/) ?? (s === 'References' ? [s, '', s] : null);
+				if (m) sections.push({ n: m[1], title: m[2], page: i, top: Math.max(0, (height - it.transform[5] - it.height * 1.6) / height) });
+			}
+		}
+		return { sections, words, version };
+	}
+
+	function buildSheets() {
+		stack.querySelector('[data-wp-skeleton]')?.remove();
+		for (let i = 1; i <= doc.numPages; i++) {
+			const el = document.createElement('div');
+			el.className = 'sheet';
+			el.style.aspectRatio = '612 / 792';
+			el.dataset.page = String(i);
+			el.setAttribute('aria-label', `Page ${i}`);
+			el.setAttribute('role', 'region');
+			const canvas = document.createElement('canvas');
+			canvas.setAttribute('aria-hidden', 'true');
+			el.append(canvas);
+			stack.append(el);
+			sheets.push({ el, canvas, renderedAt: 0, text: false });
+		}
+	}
+
+	async function render(s: Sheet, i: number) {
+		const page = (s.page ??= await doc.getPage(i + 1));
+		const base = page.getViewport({ scale: 1 });
+		s.el.style.aspectRatio = `${base.width} / ${base.height}`;
+		const cssW = s.el.clientWidth;
+		s.el.style.setProperty('--total-scale-factor', String(cssW / base.width));
+		if (Math.abs(s.renderedAt - cssW) < 2) return;
+		s.renderedAt = cssW;
+		const dpr = Math.min(window.devicePixelRatio || 1, 2);
+		const vp = page.getViewport({ scale: (cssW / base.width) * dpr });
+		const off = document.createElement('canvas');
+		off.width = Math.floor(vp.width);
+		off.height = Math.floor(vp.height);
+		await page.render({ canvas: off, viewport: vp }).promise;
+		// Swap in one go so a re-render never flashes blank
+		s.canvas.width = off.width;
+		s.canvas.height = off.height;
+		s.canvas.getContext('2d')!.drawImage(off, 0, 0);
+		if (!s.text) {
+			s.text = true;
+			const layer = document.createElement('div');
+			layer.className = 'textLayer';
+			s.el.append(layer);
+			await new pdfjs.TextLayer({ textContentSource: page.streamTextContent(), container: layer, viewport: base }).render();
+		}
+	}
+
+	const visible = new Set<number>();
+	const renderIO = new IntersectionObserver(
+		(entries) =>
+			entries.forEach((e) => {
+				const i = sheets.findIndex((s) => s.el === e.target);
+				if (e.isIntersecting) {
+					visible.add(i);
+					render(sheets[i], i);
+				} else visible.delete(i);
+			}),
+		{ rootMargin: '1200px 0px' },
+	);
+
+	// Current page: whichever sheet crosses the middle of the viewport
+	const pageIO = new IntersectionObserver(
+		(entries) =>
+			entries.forEach((e) => {
+				if (!e.isIntersecting) return;
+				const n = Number((e.target as HTMLElement).dataset.page);
+				setText('[data-wp-current]', String(n));
+				progress?.style.setProperty('transform', `scaleX(${n / doc.numPages})`);
+			}),
+		{ rootMargin: '-50% 0px -50% 0px' },
+	);
+
+	function buildToc(sections: Awaited<ReturnType<typeof readStructure>>['sections']) {
+		if (!sections.length) {
+			root.querySelector('aside')?.classList.add('lg:hidden');
+			root.querySelector('[data-wp-toc-mobile]')?.remove();
+			return;
+		}
+		const anchors = sections.map((s, k) => {
+			const a = document.createElement('span');
+			a.className = 'wp-anchor';
+			a.id = `wp-s${k}`;
+			a.style.top = `${s.top * 100}%`;
+			sheets[s.page - 1].el.append(a);
+			return a;
+		});
+		tocs.forEach((ol) => {
+			ol.innerHTML = '';
+			sections.forEach((s, k) => {
+				const li = document.createElement('li');
+				const a = document.createElement('a');
+				a.href = `#wp-s${k}`;
+				a.dataset.k = String(k);
+				a.innerHTML = `<span class="n"></span><span></span>`;
+				a.children[0].textContent = s.n;
+				a.children[1].textContent = s.title;
+				a.addEventListener('click', (e) => {
+					e.preventDefault();
+					const lenis = lenisInstance();
+					if (lenis) lenis.scrollTo(anchors[k], { offset: -136 });
+					else anchors[k].scrollIntoView({ block: 'start' });
+					ol.closest('details')?.removeAttribute('open');
+				});
+				li.append(a);
+				ol.append(li);
+			});
+		});
+		// Active section: the last heading that has passed the upper third of the viewport
+		const passed = new Set<number>();
+		const io = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((e) => {
+					const k = Number((e.target as HTMLElement).id.slice(4));
+					if (e.boundingClientRect.top < window.innerHeight * 0.35) passed.add(k);
+					else passed.delete(k);
+				});
+				const active = passed.size ? Math.max(...passed) : 0;
+				root.querySelectorAll<HTMLAnchorElement>('.toc a').forEach((a) => a.setAttribute('aria-current', String(Number(a.dataset.k) === active)));
+			},
+			{ rootMargin: '0px 0px -65% 0px' },
+		);
+		anchors.forEach((a) => io.observe(a));
+	}
+
+	function setZoom(i: number) {
+		zoomIdx = Math.max(0, Math.min(ZOOMS.length - 1, i));
+		stack.style.setProperty('--zoom', String(ZOOMS[zoomIdx]));
+		zoomLabel.value = `${Math.round(ZOOMS[zoomIdx] * 100)}%`;
+		zoomBtns[0].disabled = zoomIdx === 0;
+		zoomBtns[1].disabled = zoomIdx === ZOOMS.length - 1;
+	}
+	zoomBtns.forEach((b) => b.addEventListener('click', () => setZoom(zoomIdx + Number(b.dataset.wpZoom))));
+
+	// Night pages, remembered per viewer
+	const setNight = (on: boolean) => {
+		root.classList.toggle('is-night', on);
+		nightBtn.setAttribute('aria-pressed', String(on));
+		try {
+			localStorage.setItem('wp-night', on ? '1' : '0');
+		} catch {}
+	};
+	nightBtn.addEventListener('click', () => setNight(!root.classList.contains('is-night')));
+	try {
+		setNight(localStorage.getItem('wp-night') === '1');
+	} catch {}
+
+	// Re-render visible pages at the new width after zoom or resize settles
+	let t: number | undefined;
+	new ResizeObserver(() => {
+		clearTimeout(t);
+		t = window.setTimeout(() => visible.forEach((i) => render(sheets[i], i)), 150);
+	}).observe(stack);
+
+	(async () => {
+		try {
+			doc = await load();
+		} catch {
+			stack.classList.add('hidden');
+			root.querySelector('[data-wp-error]')!.classList.remove('hidden');
+			return;
+		}
+		setZoom(1);
+		buildSheets();
+		setText('[data-wp-pages]', String(doc.numPages));
+		setText('[data-wp-total]', String(doc.numPages));
+		sheets.forEach((s) => {
+			renderIO.observe(s.el);
+			pageIO.observe(s.el);
+		});
+		const { sections, words, version } = await readStructure();
+		if (version) setText('[data-wp-version]', version);
+		setText('[data-wp-read]', `${Math.round(words / 230)} min`);
+		setText('[data-wp-count]', String(sections.filter((s) => s.n).length));
+		buildToc(sections);
+	})();
+</script>
