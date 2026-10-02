@@ -4,7 +4,9 @@ import Button from '../ui/Button.astro';
 import WireMark from './WireMark.astro';
 import { NAV, EARLY_ACCESS_HREF } from '../../lib/site';
 
-const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+// Compare without trailing slashes so /developers and /developers/ both mark the item
+const norm = (p: string) => p.replace(/\/$/, '') || '/';
+const path = norm(Astro.url.pathname);
 ---
 
 <div id="nav-sentinel" class="pointer-events-none absolute inset-x-0 top-0 h-2" aria-hidden="true"></div>
@@ -23,7 +25,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 							href={item.href}
 							target={item.external ? '_blank' : undefined}
 							rel={item.external ? 'noopener noreferrer' : undefined}
-							aria-current={!item.external && item.href === path ? 'page' : undefined}
+							aria-current={!item.external && norm(item.href) === path ? 'page' : undefined}
 							class="nav-link inline-flex h-9 items-center gap-1 rounded-control px-3 text-sm text-fg-2 transition-colors duration-(--duration-ui) hover:text-fg-1 aria-[current=page]:text-fg-1"
 						>
 							{item.label}

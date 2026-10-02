@@ -17,11 +17,11 @@ const kinds: Record<string, string> = { nodeop: 'daemon', kiod: 'wallet', clio: 
 			<p class="mt-5 max-w-[40ch] text-fg-2" data-reveal>
 				Coordinate assets, ownership and execution across chains from one toolchain, built on the AntelopeIO lineage.
 			</p>
-			<p class="mt-6 font-mono text-mono-xs uppercase tracking-widest text-fg-3" data-reveal data-reveal-delay="0.06">
-				{capabilities.map((c, i) => <>{i > 0 && <span class="mx-1.5 text-line-strong">/</span>}{c}</>)}
+			<p class="mt-6 flex flex-wrap gap-y-1 font-mono text-mono-xs uppercase tracking-widest text-fg-3" data-reveal data-reveal-delay="0.06">
+				{capabilities.map((c, i) => <span class="whitespace-nowrap">{c}{i < capabilities.length - 1 && <span class="mx-1.5 text-line-strong">/</span>}</span>)}
 			</p>
 			<div class="mt-10 flex flex-wrap items-center gap-5" data-reveal data-reveal-delay="0.12">
-				<Button href="/developers" variant="secondary">Build on Wire</Button>
+				<Button href="/developers/" variant="secondary">Build on Wire</Button>
 				<TextLink href={GITHUB_HREF} external>GitHub</TextLink>
 			</div>
 		</div>
@@ -30,7 +30,7 @@ const kinds: Record<string, string> = { nodeop: 'daemon', kiod: 'wallet', clio: 
 			{
 				STACK.map((s, i) => (
 					<li class="border-b border-line">
-						<a href="/developers#stack" class="row group relative grid grid-cols-[2rem_1fr_auto] items-start gap-x-4 py-5 md:grid-cols-[2.5rem_9rem_1fr_auto] md:py-6" data-active={i === 0 ? 'true' : undefined}>
+						<a href="/developers/#stack" class="row group relative grid grid-cols-[2rem_1fr_auto] items-start gap-x-4 py-5 md:grid-cols-[2.5rem_9rem_1fr_auto] md:py-6" data-active={i === 0 ? 'true' : undefined}>
 							<span class="marker" aria-hidden="true" />
 							<span class="pt-1 font-mono text-mono-xs text-fg-3">0{i + 1}</span>
 							<span class="name font-mono text-body-l text-fg-2">{s.name}</span>

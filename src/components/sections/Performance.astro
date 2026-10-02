@@ -14,7 +14,7 @@ const specs = [
 <Section id="performance" labelledby="performance-title" class="border-t border-line">
 	<div class="grid gap-14 lg:grid-cols-12 lg:gap-10">
 		<div class="lg:col-span-6">
-			<h2 id="performance-title" class="text-h2 font-medium text-fg-1" data-split>Built for machine-scale commerce</h2>
+			<h2 id="performance-title" class="text-h2 font-medium text-fg-1" data-split>Built for <span class="whitespace-nowrap">machine-scale</span> commerce</h2>
 			<div class="mt-12 lg:mt-20">
 				<p class="text-[clamp(5rem,2rem+11vw,11rem)] leading-[0.85] font-medium tracking-[-0.055em] text-fg-1 tabular-nums">
 					<span data-count="10000">10,000</span><span class="text-accent">+</span>
@@ -26,11 +26,11 @@ const specs = [
 		<div class="lg:col-span-6 lg:pt-3">
 			<ul class="grid gap-px overflow-hidden rounded-panel border border-line bg-line sm:grid-cols-2">
 				{specs.map((s, i) => (
-					<li class:list={['flex flex-col justify-between gap-10 bg-ink-950 p-6', i === 0 && 'sm:col-span-2']} data-reveal data-reveal-delay={i * 0.05}>
-						<Icon name={s.icon} class="size-5 text-fg-3" aria-hidden="true" />
+					<li class:list={['flex items-center gap-4 bg-ink-950 px-5 py-4 sm:flex-col sm:items-start sm:justify-between sm:gap-10 sm:p-6', i === 0 && 'sm:col-span-2']} data-reveal data-reveal-delay={i * 0.05}>
+						<Icon name={s.icon} class="size-5 shrink-0 text-fg-3" aria-hidden="true" />
 						<div>
-							<p class="text-h3 font-medium text-fg-1">{s.value}</p>
-							<p class="mt-1 text-fg-2">{s.label}</p>
+							<p class="text-lg font-medium text-fg-1 sm:text-h3">{s.value}</p>
+							<p class="text-sm text-fg-2 sm:mt-1 sm:text-base">{s.label}</p>
 						</div>
 					</li>
 				))}

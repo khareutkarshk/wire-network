@@ -46,7 +46,7 @@
 	/* Foreground */
 	--color-fg-1: #e8edf4;
 	--color-fg-2: #a9b3c0;
-	--color-fg-3: #6e7885;
+	--color-fg-3: #7a8491; /* AA (4.5:1+) on ink-950, 900 and 800 */
 
 	/* The one accent */
 	--color-accent: #2f6bff;
@@ -129,6 +129,16 @@
 	body {
 		min-height: 100dvh;
 		background: var(--color-ink-950);
+	}
+
+	/* Phones: no stranded words. Headings balance their lines, body copy avoids one-word last lines. */
+	@media (max-width: 39.99rem) {
+		h1, h2, h3, blockquote {
+			text-wrap: balance;
+		}
+		p, li, dd {
+			text-wrap: pretty;
+		}
 	}
 
 	h1, h2, h3, h4 {

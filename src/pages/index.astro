@@ -14,7 +14,17 @@ import Closing from '../components/sections/Closing.astro';
 // Section blueprint and rationale: docs/site-plan.md
 ---
 
-<Base>
+<Base
+	schema={[
+		{
+			'@context': 'https://schema.org',
+			'@type': 'WebSite',
+			name: 'Wire Network',
+			url: 'https://wire.network/',
+			description: 'Wire coordinates ownership and execution across blockchains through one Universal Transaction Layer.',
+		},
+	]}
+>
 	<Hero />
 	<NetworkBar />
 	<Problem />

@@ -46,8 +46,8 @@ const fanOut = Array.from({ length: 8 }, (_, i) => {
 
 				<!-- Diagram -->
 				<figure class="lg:col-span-8 lg:self-center" aria-label="Applications connect to the Wire UTL, which coordinates execution across blockchains">
-					<ul class="grid grid-cols-2 gap-2 sm:grid-cols-5" data-layer="apps">
-						{apps.map((a) => <li class="flex h-12 items-center justify-center rounded-control border border-line-strong bg-ink-900 px-2 text-center text-sm text-fg-1">{a}</li>)}
+					<ul class="flex flex-wrap justify-center gap-2 sm:grid sm:grid-cols-5" data-layer="apps">
+						{apps.map((a) => <li class="flex h-11 items-center justify-center rounded-control border border-line-strong bg-ink-900 px-4 text-center text-sm text-fg-1 sm:h-12 sm:px-2">{a}</li>)}
 					</ul>
 
 					<svg class="utl-lines hidden h-20 w-full sm:block" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">

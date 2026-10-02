@@ -15,7 +15,7 @@ import { EARLY_ACCESS_HREF } from '../../lib/site';
 	</div>
 
 	<Container class="relative">
-		<h1 id="hero-title" class="text-[clamp(3rem,1.2rem+6.4vw,7rem)] leading-[0.98] tracking-[-0.045em] font-medium" data-hero-title>
+		<h1 id="hero-title" class="text-[clamp(2.125rem,0.9rem+6.4vw,7rem)] sm:text-[clamp(3rem,1.2rem+6.4vw,7rem)] leading-[0.98] tracking-[-0.045em] font-medium" data-hero-title>
 			<span class="block text-fg-1">Assets stay home.</span>
 			<span class="block text-fg-3">Ownership moves.</span>
 		</h1>
@@ -23,8 +23,8 @@ import { EARLY_ACCESS_HREF } from '../../lib/site';
 			Wire tracks ownership across Ethereum, Solana and 300+ chains. People, apps and AI agents get one answer: settled or recovered.
 		</p>
 		<div class="mt-10 flex flex-wrap items-center gap-3" data-hero-in>
-			<Button href={EARLY_ACCESS_HREF}>Get Early Access</Button>
-			<Button href="/#about" variant="secondary">Explore the Network</Button>
+			<Button href={EARLY_ACCESS_HREF} class="max-sm:w-full">Get Early Access</Button>
+			<Button href="/#about" variant="secondary" class="max-sm:w-full">Explore the Network</Button>
 		</div>
 
 		<!-- Live receipt: a real lifecycle, not a mock dashboard. Desktop only. -->
@@ -172,6 +172,8 @@ import { EARLY_ACCESS_HREF } from '../../lib/site';
 			SplitText.create(title.querySelectorAll('span'), {
 				type: 'lines',
 				mask: 'lines',
+				// Line wrappers only; words stay intact and readable. (aria-label is not allowed on a plain span.)
+				aria: 'none',
 				autoSplit: true,
 				onSplit(self) {
 					gsap.set(title, { visibility: 'visible' });

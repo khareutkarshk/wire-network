@@ -1,8 +1,13 @@
 ---
 import { Icon } from 'astro-icon/components';
+
+// Submissions POST as JSON to PUBLIC_EARLY_ACCESS_ENDPOINT (Formspree, Basin, a CRM webhook or your own API).
+// Without it the form says sign-up is unavailable instead of faking success.
+if (!import.meta.env.PUBLIC_EARLY_ACCESS_ENDPOINT) {
+	console.warn('[early-access] PUBLIC_EARLY_ACCESS_ENDPOINT is not set: the sign-up form cannot submit. See .env.example.');
+}
 ---
 
-<!-- TODO: wire the submit to the real early-access endpoint (form service, CRM, or API). -->
 <dialog id="early-access" class="ea m-auto w-[min(30rem,calc(100vw-2rem))] rounded-panel border border-line-strong bg-ink-900 p-0 text-fg-2 backdrop:bg-ink-950/80 backdrop:backdrop-blur-sm" aria-labelledby="ea-title">
 	<div class="panel-edge p-7 md:p-8">
 		<div class="flex items-start justify-between gap-6">
@@ -29,6 +34,8 @@ import { Icon } from 'astro-icon/components';
 				/>
 				<p id="ea-help" class="text-sm text-fg-3">One email at launch. No newsletter.</p>
 				<p id="ea-error" class="hidden text-sm text-state-recovering" role="alert">Enter a valid email address.</p>
+				<!-- Honeypot: hidden from people, bots fill it in -->
+				<input type="text" name="company_website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
 			</div>
 			<button type="submit" class="mt-7 inline-flex h-11 w-full items-center justify-center gap-2 rounded-control bg-fg-1 font-medium text-ink-950 transition-transform duration-(--duration-ui) hover:bg-white active:translate-y-px disabled:opacity-60" data-ea-submit>
 				<span data-ea-label>Request access</span>
@@ -85,9 +92,23 @@ import { Icon } from 'astro-icon/components';
 		}),
 	);
 
-	const setError = (on: boolean) => {
+	const ENDPOINT = import.meta.env.PUBLIC_EARLY_ACCESS_ENDPOINT as string | undefined;
+	const label = form.querySelector<HTMLElement>('[data-ea-label]')!;
+	const setError = (on: boolean, message = 'Enter a valid email address.') => {
 		input.setAttribute('aria-invalid', String(on));
+		error.textContent = message;
 		error.classList.toggle('hidden', !on);
+	};
+	const finish = () => {
+		dialog.querySelector('[data-ea-echo]')!.textContent = input.value;
+		form.classList.add('hidden');
+		done.classList.remove('hidden');
+	};
+	const fail = (message: string) => {
+		submit.disabled = false;
+		label.textContent = 'Request access';
+		error.textContent = message;
+		error.classList.remove('hidden');
 	};
 	input.addEventListener('input', () => input.getAttribute('aria-invalid') === 'true' && setError(!input.validity.valid));
 
@@ -99,11 +120,21 @@ import { Icon } from 'astro-icon/components';
 			return;
 		}
 		setError(false);
+		// Bots that fill the honeypot get the success screen and nothing is sent
+		if ((form.elements.namedItem('company_website') as HTMLInputElement).value) return finish();
+		if (!ENDPOINT) return fail('Sign-up is not available right now. Please try again later.');
 		submit.disabled = true;
-		form.querySelector('[data-ea-label]')!.textContent = 'Sending…';
-		await new Promise((r) => setTimeout(r, 600)); // TODO: replace with the real request
-		dialog.querySelector('[data-ea-echo]')!.textContent = input.value;
-		form.classList.add('hidden');
-		done.classList.remove('hidden');
+		label.textContent = 'Sending…';
+		try {
+			const res = await fetch(ENDPOINT, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+				body: JSON.stringify({ email: input.value, source: location.pathname }),
+			});
+			if (!res.ok) throw new Error(String(res.status));
+			finish();
+		} catch {
+			fail('That did not go through. Check your connection and try again.');
+		}
 	});
 </script>

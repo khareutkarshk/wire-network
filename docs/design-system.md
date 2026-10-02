@@ -25,7 +25,7 @@ The palette evolves the live wire.network tokens (obsidian, platinum, cobalt). T
 | `line` / `line-strong` | platinum at 8% / 16% | Hairlines, panel borders | n/a |
 | `fg-1` | `#E8EDF4` | Headings, primary text | 17.1:1 |
 | `fg-2` | `#A9B3C0` | Body copy | 9.5:1 |
-| `fg-3` | `#6E7885` | Meta, labels, captions | 4.5:1 |
+| `fg-3` | `#7A8491` | Meta, labels, captions | 5.3 / 5.0 / 4.6:1 on ink-950 / 900 / 800 |
 | `accent` | `#2F6BFF` | The one accent: lines, focus rings, signal | 4.5:1 (large/UI only) |
 | `accent-soft` | `#7EA5FF` | Links and accent text | 8.4:1 |
 | `state-settled` | `#44E2A1` | Lifecycle SETTLED only | 12.1:1 |

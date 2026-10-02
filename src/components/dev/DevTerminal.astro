@@ -73,7 +73,7 @@ const tabs: { id: string; label: string; path: string; lines: Line[]; copy: stri
 						aria-controls={`term-panel-${t.id}`}
 						aria-selected={i === 0 ? 'true' : 'false'}
 						tabindex={i === 0 ? 0 : -1}
-						class="term-tab rounded-control px-3 py-1.5 font-mono text-mono-s"
+						class="term-tab rounded-control px-3 py-2 font-mono text-mono-s sm:py-1.5"
 						data-term-tab={t.id}
 					>
 						{t.label}
@@ -81,7 +81,7 @@ const tabs: { id: string; label: string; path: string; lines: Line[]; copy: stri
 				))
 			}
 		</div>
-		<button type="button" class="copy inline-flex items-center gap-1.5 rounded-control px-2.5 py-1.5 font-mono text-mono-xs text-fg-3" data-term-copy>
+		<button type="button" class="copy inline-flex items-center gap-1.5 rounded-control px-2.5 py-2.5 font-mono text-mono-xs text-fg-3 sm:py-1.5" data-term-copy>
 			<Icon name="ph:copy" class="size-3.5" data-icon-copy aria-hidden="true" />
 			<Icon name="ph:check" class="hidden size-3.5 text-state-settled" data-icon-done aria-hidden="true" />
 			<span data-copy-label>Copy</span>
@@ -96,7 +96,8 @@ const tabs: { id: string; label: string; path: string; lines: Line[]; copy: stri
 					role="tabpanel"
 					id={`term-panel-${t.id}`}
 					aria-labelledby={`term-tab-${t.id}`}
-					class="absolute inset-0 overflow-x-auto p-5"
+					class="absolute inset-0 overflow-x-auto p-5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+					tabindex="0"
 					hidden={i !== 0}
 					data-term-panel={t.id}
 					data-copy={t.copy}

@@ -343,6 +343,19 @@ const builtIn = ['Cryptographic transaction validation', 'Economically enforced 
 		color: var(--color-fg-1);
 		white-space: nowrap;
 	}
+	/* Phones: whichever layer is showing sits in flow, so the route is only as tall as what's on screen */
+	@media (max-width: 47.99rem) {
+		.layer-wire {
+			position: absolute;
+		}
+		.sec[data-mode='wire'] .layer-wire {
+			position: static;
+		}
+		.sec[data-mode='wire'] .layer-bridge {
+			position: absolute;
+			inset: 0 0 auto;
+		}
+	}
 	.sec[data-mode='wire'] .layer-bridge {
 		opacity: 0;
 		transform: scale(0.98);

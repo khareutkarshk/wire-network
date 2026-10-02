@@ -13,7 +13,21 @@ const AUTHORS = 'Kyle Dolan, Ken DiCross, Joseph Rubin, Jack Rogers';
 const LOCAL_PDF = WHITEPAPER_PDF_SOURCES.at(-1)!;
 ---
 
-<Base title="Whitepaper | Wire Network" description="Read the Wire Network whitepaper: consensus, governance, the Universal Transaction Layer, Crypto SSO and the network economy.">
+<Base
+	title="Whitepaper | Wire Network"
+	description="Read the Wire Network whitepaper: consensus, governance, the Universal Transaction Layer, Crypto SSO and the network economy."
+	schema={[
+		{
+			'@context': 'https://schema.org',
+			'@type': 'TechArticle',
+			headline: PAPER_TITLE,
+			author: AUTHORS.split(', ').map((name) => ({ '@type': 'Person', name })),
+			publisher: { '@type': 'Organization', name: 'Wire Network' },
+			url: 'https://wire.network/whitepaper/',
+			encoding: { '@type': 'MediaObject', contentUrl: WHITEPAPER_GITHUB_HREF, encodingFormat: 'application/pdf' },
+		},
+	]}
+>
 	<!-- Header -->
 	<section class="relative overflow-hidden pt-36 pb-12 md:pt-44 md:pb-16" aria-labelledby="wp-title">
 		<div class="wp-hero-bg pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
@@ -28,15 +42,15 @@ const LOCAL_PDF = WHITEPAPER_PDF_SOURCES.at(-1)!;
 					<p class="mt-4 text-sm text-fg-3" data-reveal data-reveal-delay="0.04">{AUTHORS}</p>
 				</div>
 				<div class="flex flex-wrap gap-3 lg:col-span-4 lg:justify-end" data-reveal data-reveal-delay="0.08">
-					<Button href={WHITEPAPER_GITHUB_HREF} variant="secondary" external>View on GitHub</Button>
-					<Button href={LOCAL_PDF} icon="ph:download-simple" download="Wire-Network-Whitepaper.pdf" data-wp-download>Download PDF</Button>
+					<Button href={WHITEPAPER_GITHUB_HREF} variant="secondary" external class="max-sm:w-full">View on GitHub</Button>
+					<Button href={LOCAL_PDF} icon="ph:download-simple" download="Wire-Network-Whitepaper.pdf" data-wp-download class="max-sm:w-full">Download PDF</Button>
 				</div>
 			</div>
 
 			<dl class="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-panel border border-line bg-line md:grid-cols-4" data-reveal data-reveal-delay="0.12">
 				<div class="bg-ink-950 px-5 py-4">
 					<dt class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Version</dt>
-					<dd class="mt-1.5 font-mono text-fg-1" data-wp-version>Living document</dd>
+					<dd class="mt-1.5 font-mono text-fg-1" data-wp-version>Latest</dd>
 				</div>
 				<div class="bg-ink-950 px-5 py-4">
 					<dt class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Pages</dt>
@@ -59,7 +73,7 @@ const LOCAL_PDF = WHITEPAPER_PDF_SOURCES.at(-1)!;
 		<Container>
 			<div class="grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] xl:grid-cols-[17rem_minmax(0,1fr)]">
 				<!-- Contents, desktop -->
-				<aside class="hidden lg:block">
+				<div class="hidden lg:block" data-wp-aside>
 					<nav class="sticky top-[5.5rem] pt-10" aria-label="Whitepaper contents">
 						<p class="font-mono text-mono-xs uppercase tracking-[0.12em] text-fg-3">Contents</p>
 						<ol class="toc mt-5 flex flex-col" data-wp-toc></ol>
@@ -67,7 +81,7 @@ const LOCAL_PDF = WHITEPAPER_PDF_SOURCES.at(-1)!;
 							<div class="h-px origin-left scale-x-0 bg-accent transition-transform duration-(--duration-reveal) ease-out-expo" data-wp-progress></div>
 						</div>
 					</nav>
-				</aside>
+				</div>
 
 				<div class="min-w-0">
 					<!-- Toolbar -->
@@ -93,7 +107,7 @@ const LOCAL_PDF = WHITEPAPER_PDF_SOURCES.at(-1)!;
 								<Icon name="ph:plus" class="mx-auto size-4" aria-hidden="true" />
 							</button>
 							<span class="mx-2 h-5 w-px bg-line" aria-hidden="true"></span>
-							<button type="button" class="tool inline-flex h-8 items-center gap-2 rounded-control px-2.5 text-sm" aria-pressed="false" data-wp-night>
+							<button type="button" class="tool inline-flex h-8 items-center gap-2 rounded-control px-2.5 text-sm" aria-pressed="false" aria-label="Night pages" data-wp-night>
 								<Icon name="ph:moon" class="size-4" aria-hidden="true" />
 								<span class="hidden sm:inline">Night pages</span>
 							</button>
@@ -394,7 +408,7 @@ const LOCAL_PDF = WHITEPAPER_PDF_SOURCES.at(-1)!;
 
 	function buildToc(sections: Awaited<ReturnType<typeof readStructure>>['sections']) {
 		if (!sections.length) {
-			root.querySelector('aside')?.classList.add('lg:hidden');
+			root.querySelector('[data-wp-aside]')?.classList.add('lg:hidden');
 			root.querySelector('[data-wp-toc-mobile]')?.remove();
 			return;
 		}

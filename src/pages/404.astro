@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import Container from '../components/ui/Container.astro';
+import Button from '../components/ui/Button.astro';
+import LifecycleChip from '../components/ui/LifecycleChip.astro';
+---
+
+<Base title="Page not found | Wire Network" description="This page does not exist." noindex>
+	<section class="flex min-h-[80dvh] items-center pt-32 pb-20" aria-labelledby="nf-title">
+		<Container>
+			<LifecycleChip state="recovering" />
+			<h1 id="nf-title" class="mt-6 max-w-[16ch] text-[clamp(2.5rem,1.4rem+4vw,4.5rem)] leading-[1] tracking-[-0.04em] font-medium text-fg-1">
+				This route doesn't resolve.
+			</h1>
+			<p class="mt-6 max-w-[42ch] text-body-l text-fg-2">
+				Every transaction on Wire has a defined recovery path. So does this page.
+			</p>
+			<div class="mt-10 flex flex-wrap gap-3">
+				<Button href="/" class="max-sm:w-full">Back to home</Button>
+				<Button href="/developers/" variant="secondary" class="max-sm:w-full">Developers</Button>
+			</div>
+		</Container>
+	</section>
+</Base>

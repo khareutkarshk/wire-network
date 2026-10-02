@@ -1,7 +1,8 @@
 // Convergence field: many chain streams resolving into one coordinated layer.
 // Ported from Originkit "Stream Convergence" (originkit.dev, free component library),
 // re-tinted to Wire tokens and hardened for production:
-//   - DPR capped at 1.5
+//   - DPR capped at 1.5 (1 on phones and touch devices, which also run at 30fps)
+//   - a still frame paints at once; the loop starts after page load, when the browser is idle
 //   - render loop pauses when offscreen or the tab is hidden
 //   - prefers-reduced-motion renders one still frame and stops
 //   - no fixed min size; fills its parent
@@ -187,8 +188,13 @@ export default function Convergence({
 		let last = performance.now();
 		let visible = true;
 
+		// Phones and touch devices: half the pixels and half the frames
+		const small = window.matchMedia('(max-width: 767px), (pointer: coarse)').matches;
+		const frameMs = small ? 1000 / 30 : 0;
+		let armed = false;
+
 		const resize = () => {
-			const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+			const dpr = Math.min(window.devicePixelRatio || 1, small ? 1 : MAX_DPR);
 			const bw = Math.max(1, Math.round(canvas.clientWidth * dpr));
 			const bh = Math.max(1, Math.round(canvas.clientHeight * dpr));
 			if (canvas.width !== bw || canvas.height !== bh) {
@@ -216,13 +222,14 @@ export default function Convergence({
 		};
 
 		const loop = (now: number) => {
+			raf = requestAnimationFrame(loop);
+			if (frameMs && now - last < frameMs) return;
 			const dt = Math.min(0.05, (now - last) / 1000);
 			last = now;
 			draw(dt);
-			raf = requestAnimationFrame(loop);
 		};
 		const start = () => {
-			if (raf || reduce || !visible || document.hidden) return;
+			if (!armed || raf || reduce || !visible || document.hidden) return;
 			last = performance.now();
 			raf = requestAnimationFrame(loop);
 		};
@@ -267,9 +274,17 @@ export default function Convergence({
 			canvas.addEventListener('pointerleave', onLeave);
 		}
 
-		start();
+		// Animate only once the page has loaded and the main thread is free
+		const arm = () => {
+			armed = true;
+			start();
+		};
+		const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(arm, { timeout: 2500 }) : setTimeout(arm, 1200));
+		if (document.readyState === 'complete') idle();
+		else window.addEventListener('load', idle, { once: true });
 
 		return () => {
+			window.removeEventListener('load', idle);
 			stop();
 			ro.disconnect();
 			io.disconnect();
